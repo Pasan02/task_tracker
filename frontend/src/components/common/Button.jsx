@@ -10,10 +10,10 @@ const StyledButton = styled.button`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-md);
   cursor: pointer;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   transition: all 0.2s ease;
   position: relative;
   
@@ -38,39 +38,39 @@ const StyledButton = styled.button`
   
   /* Variant styles */
   ${props => props.$variant === 'primary' && css`
-    background-color: #3b82f6;
+    background-color: var(--color-primary-500);
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: #2563eb;
+      background-color: var(--color-primary-600);
     }
   `}
   
   ${props => props.$variant === 'secondary' && css`
-    background-color: #f3f4f6;
-    color: #374151;
-    border: 1px solid #d1d5db;
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
     
     &:hover:not(:disabled) {
-      background-color: #e5e7eb;
+      background-color: var(--color-hover);
     }
   `}
   
   ${props => props.$variant === 'danger' && css`
-    background-color: #ef4444;
+    background-color: var(--color-error-500);
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: #dc2626;
+      background-color: var(--color-error-600);
     }
   `}
   
   ${props => props.$variant === 'success' && css`
-    background-color: #10b981;
+    background-color: var(--color-success-500);
     color: white;
     
     &:hover:not(:disabled) {
-      background-color: #059669;
+      background-color: var(--color-success-600);
     }
   `}
   

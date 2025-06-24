@@ -1,0 +1,217 @@
+
+
+/* Light Theme (Default) */
+:root,
+[data-theme="light"] {
+  --color-background: #ffffff;
+  --color-surface: #f9fafb;
+  --color-card: #ffffff;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-text-disabled: #d1d5db;
+  --color-border: #e5e7eb;
+  --color-border-light: #f3f4f6;
+  --color-hover: #f3f4f6;
+  --color-focus: rgba(59, 130, 246, 0.1);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Component specific light theme colors */
+  --color-sidebar-bg: #ffffff;
+  --color-header-bg: #ffffff;
+  --color-input-bg: #ffffff;
+  --color-dropdown-bg: #ffffff;
+  --color-tooltip-bg: #1f2937;
+  --color-tooltip-text: #ffffff;
+
+  /* Status specific colors */
+  --color-task-todo: #f3f4f6;
+  --color-task-in-progress: #fef3c7;
+  --color-task-done: #dcfce7;
+  --color-habit-completed: #dcfce7;
+  --color-habit-pending: #f3f4f6;
+
+  /* Priority colors */
+  --color-priority-high: #fee2e2;
+  --color-priority-medium: #fef3c7;
+  --color-priority-low: #dcfce7;
+
+  /* Special elements */
+  --color-calendar-today: #dbeafe;
+  --color-calendar-completed: #dcfce7;
+  --color-calendar-available: #ffffff;
+  --color-streak-bg: #fef3c7;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-background: #111827;
+  --color-surface: #1f2937;
+  --color-card: #1f2937;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-tertiary: #9ca3af;
+  --color-text-disabled: #6b7280;
+  --color-border: #374151;
+  --color-border-light: #4b5563;
+  --color-hover: #374151;
+  --color-focus: rgba(59, 130, 246, 0.2);
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Component specific dark theme colors */
+  --color-sidebar-bg: #1f2937;
+  --color-header-bg: #1f2937;
+  --color-input-bg: #374151;
+  --color-dropdown-bg: #374151;
+  --color-tooltip-bg: #374151;
+  --color-tooltip-text: #f9fafb;
+
+  /* Status specific colors (darker variants) */
+  --color-task-todo: #374151;
+  --color-task-in-progress: rgba(245, 158, 11, 0.1);
+  --color-task-done: rgba(16, 185, 129, 0.1);
+  --color-habit-completed: rgba(16, 185, 129, 0.1);
+  --color-habit-pending: #374151;
+
+  /* Priority colors (darker variants) */
+  --color-priority-high: rgba(239, 68, 68, 0.1);
+  --color-priority-medium: rgba(245, 158, 11, 0.1);
+  --color-priority-low: rgba(16, 185, 129, 0.1);
+
+  /* Special elements */
+  --color-calendar-today: rgba(59, 130, 246, 0.2);
+  --color-calendar-completed: rgba(16, 185, 129, 0.2);
+  --color-calendar-available: #374151;
+  --color-streak-bg: rgba(245, 158, 11, 0.1);
+
+  /* Adjust shadows for dark mode */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Auto Theme (System Preference) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-background: #111827;
+    --color-surface: #1f2937;
+    --color-card: #1f2937;
+    --color-text-primary: #f9fafb;
+    --color-text-secondary: #d1d5db;
+    --color-text-tertiary: #9ca3af;
+    --color-text-disabled: #6b7280;
+    --color-border: #374151;
+    --color-border-light: #4b5563;
+    --color-hover: #374151;
+    --color-focus: rgba(59, 130, 246, 0.2);
+    --color-overlay: rgba(0, 0, 0, 0.7);
+
+    /* Apply all dark theme variables */
+    --color-sidebar-bg: #1f2937;
+    --color-header-bg: #1f2937;
+    --color-input-bg: #374151;
+    --color-dropdown-bg: #374151;
+    --color-tooltip-bg: #374151;
+    --color-tooltip-text: #f9fafb;
+
+    --color-task-todo: #374151;
+    --color-task-in-progress: rgba(245, 158, 11, 0.1);
+    --color-task-done: rgba(16, 185, 129, 0.1);
+    --color-habit-completed: rgba(16, 185, 129, 0.1);
+    --color-habit-pending: #374151;
+
+    --color-priority-high: rgba(239, 68, 68, 0.1);
+    --color-priority-medium: rgba(245, 158, 11, 0.1);
+    --color-priority-low: rgba(16, 185, 129, 0.1);
+
+    --color-calendar-today: rgba(59, 130, 246, 0.2);
+    --color-calendar-completed: rgba(16, 185, 129, 0.2);
+    --color-calendar-available: #374151;
+    --color-streak-bg: rgba(245, 158, 11, 0.1);
+
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* High Contrast Theme (Accessibility) */
+[data-theme="high-contrast"] {
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-card: #ffffff;
+  --color-text-primary: #000000;
+  --color-text-secondary: #000000;
+  --color-text-tertiary: #000000;
+  --color-text-disabled: #666666;
+  --color-border: #000000;
+  --color-border-light: #000000;
+  --color-hover: #f0f0f0;
+  --color-focus: #0066cc;
+  --color-overlay: rgba(0, 0, 0, 0.8);
+
+  /* Strong contrast colors */
+  --color-primary-500: #0066cc;
+  --color-success-500: #008000;
+  --color-warning-500: #ff8800;
+  --color-error-500: #cc0000;
+
+  /* Remove subtle styling in high contrast mode */
+  --shadow-xs: none;
+  --shadow-sm: 0 0 0 1px #000000;
+  --shadow-md: 0 0 0 2px #000000;
+  --shadow-lg: 0 0 0 3px #000000;
+  --shadow-xl: 0 0 0 4px #000000;
+  --shadow-2xl: 0 0 0 5px #000000;
+}
+
+/* Reduced Motion Theme */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: none;
+    --transition-base: none;
+    --transition-slow: none;
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+    --duration-slow: 0ms;
+  }
+}
+
+/* Print Styles */
+@media print {
+  :root {
+    --color-background: #ffffff;
+    --color-surface: #ffffff;
+    --color-card: #ffffff;
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    --color-text-tertiary: #666666;
+    --color-border: #cccccc;
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+  }
+}
+
+/* Theme Transition */
+* {
+  transition: 
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+/* Disable transitions during theme change to prevent flashing */
+.theme-transitioning * {
+  transition: none !important;
+}

@@ -3,23 +3,24 @@ import styled from 'styled-components';
 import { Button } from '../common';
 
 const HeaderContainer = styled.header`
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 20px;
-  height: 64px;
+  background: var(--color-header-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-5);
+  height: var(--header-height, 64px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  left: 0;
+  right: 0;
+  z-index: 1000;
 `;
 
 const LeftSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
 `;
 
 const MenuButton = styled.button`
@@ -27,15 +28,15 @@ const MenuButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 4px;
-  color: #6b7280;
+  padding: var(--space-2);
+  border-radius: var(--border-radius-md);
+  color: var(--color-text-secondary);
   font-size: 1.25rem;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: var(--color-hover);
+    color: var(--color-text-primary);
   }
   
   @media (max-width: 768px) {
@@ -46,7 +47,7 @@ const MenuButton = styled.button`
 const Logo = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   text-decoration: none;
   color: inherit;
 `;
@@ -54,8 +55,8 @@ const Logo = styled.div`
 const LogoIcon = styled.div`
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
+  background: var(--color-primary-500);
+  border-radius: var(--border-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,8 +67,8 @@ const LogoIcon = styled.div`
 const LogoText = styled.h1`
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
+  font-weight: 600;
+  color: var(--color-text-primary);
   
   @media (max-width: 480px) {
     display: none;
@@ -77,7 +78,7 @@ const LogoText = styled.h1`
 const CenterSection = styled.div`
   flex: 1;
   max-width: 400px;
-  margin: 0 20px;
+  margin: 0 var(--space-5);
   
   @media (max-width: 768px) {
     display: none;
@@ -91,22 +92,22 @@ const SearchContainer = styled.div`
 
 const SearchInput = styled.input`
   width: 100%;
-  padding: 8px 12px 8px 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  background-color: #f9fafb;
-  transition: all 0.2s ease;
-  
+  padding: var(--space-2) var(--space-3) var(--space-2) 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    background-color: white;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-  
-  &::placeholder {
-    color: #9ca3af;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-focus);
   }
 `;
 

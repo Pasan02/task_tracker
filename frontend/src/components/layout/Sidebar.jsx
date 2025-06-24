@@ -3,119 +3,119 @@ import styled from 'styled-components';
 import Navigation from './Navigation';
 
 const SidebarContainer = styled.aside`
-  width: 280px;
+  width: var(--sidebar-width, 280px);
   height: 100vh;
-  background: white;
-  border-right: 1px solid #e5e7eb;
-  padding: 20px;
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-5);
   overflow-y: auto;
   position: fixed;
   left: 0;
-  top: 64px;
-  z-index: 50;
-  transform: translateX(${props => props.$isOpen ? '0' : '-100%'});
+  top: 0;
+  z-index: 1100; /* Ensure sidebar is above content but below header overlay */
+  transform: translateX(${props => (props.$isOpen ? '0' : '-100%')});
   transition: transform 0.3s ease;
-  
+
   @media (min-width: 769px) {
-    position: static;
     transform: none;
-    transition: none;
+    height: calc(100vh - var(--header-height, 64px));
+    top: var(--header-height, 64px);
+    z-index: 900;
   }
-  
+
   @media (max-width: 768px) {
-    box-shadow: ${props => props.$isOpen ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none'};
+    box-shadow: ${props => (props.$isOpen ? 'var(--shadow-lg)' : 'none')};
   }
 `;
 
 const SidebarOverlay = styled.div`
   position: fixed;
-  top: 64px;
+  top: var(--header-height);
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--color-overlay);
   z-index: 40;
-  display: ${props => props.$isOpen ? 'block' : 'none'};
-  
+  display: ${props => (props.$isOpen ? 'block' : 'none')};
+
   @media (min-width: 769px) {
     display: none;
   }
 `;
 
-const QuickStats = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
+const ProfileSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+`;
+
+const Avatar = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-primary-500);
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
 `;
 
-const StatsTitle = styled.h3`
-  margin: 0 0 16px 0;
-  font-size: 1rem;
+const UserInfo = styled.div`
+  flex: 1;
+`;
+
+const UserName = styled.div`
   font-weight: 600;
-  opacity: 0.9;
+  color: var(--color-text-primary);
 `;
 
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-`;
-
-const StatItem = styled.div`
-  text-align: center;
-`;
-
-const StatNumber = styled.div`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-`;
-
-const StatLabel = styled.div`
-  font-size: 0.75rem;
-  opacity: 0.8;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+const UserStatus = styled.div`
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 `;
 
 const QuickActions = styled.div`
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 `;
 
 const ActionsTitle = styled.h3`
-  margin: 0 0 12px 0;
-  font-size: 0.875rem;
+  margin: 0 0 var(--space-3) 0;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 `;
 
 const ActionButton = styled.button`
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-  color: #374151;
-  font-size: 0.875rem;
-  font-weight: 500;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-card);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 8px;
-  
+  margin-bottom: var(--space-2);
+
   &:hover {
-    border-color: #3b82f6;
-    background-color: #f8fafc;
-    color: #3b82f6;
+    border-color: var(--color-primary-500);
+    background-color: var(--color-hover);
+    color: var(--color-primary-500);
   }
-  
+
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px var(--color-focus);
   }
 `;
 
@@ -125,31 +125,31 @@ const ActionIcon = styled.span`
 
 const Footer = styled.div`
   margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid #e5e7eb;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
 `;
 
 const VersionInfo = styled.div`
   text-align: center;
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-bottom: 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-2);
 `;
 
 const SupportLink = styled.button`
   width: 100%;
   background: none;
   border: none;
-  color: #6b7280;
-  font-size: 0.75rem;
-  padding: 8px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  padding: var(--space-2);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: var(--border-radius-sm);
   transition: all 0.2s ease;
-  
+
   &:hover {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: var(--color-hover);
+    color: var(--color-text-primary);
   }
 `;
 
@@ -214,27 +214,13 @@ const Sidebar = ({
     <>
       <SidebarOverlay $isOpen={isOpen} onClick={onClose} />
       <SidebarContainer $isOpen={isOpen}>
-        <QuickStats>
-          <StatsTitle>📈 Progress Overview</StatsTitle>
-          <StatsGrid>
-            <StatItem>
-              <StatNumber>{stats.totalTasks}</StatNumber>
-              <StatLabel>Total Tasks</StatLabel>
-            </StatItem>
-            <StatItem>
-              <StatNumber>{completionRate}%</StatNumber>
-              <StatLabel>Completed</StatLabel>
-            </StatItem>
-            <StatItem>
-              <StatNumber>{stats.totalHabits}</StatNumber>
-              <StatLabel>Habits</StatLabel>
-            </StatItem>
-            <StatItem>
-              <StatNumber>{stats.todayHabits}</StatNumber>
-              <StatLabel>Today Done</StatLabel>
-            </StatItem>
-          </StatsGrid>
-        </QuickStats>
+        <ProfileSection>
+          <Avatar>TF</Avatar>
+          <UserInfo>
+            <UserName>TaskFlow User</UserName>
+            <UserStatus>Active</UserStatus>
+          </UserInfo>
+        </ProfileSection>
 
         <QuickActions>
           <ActionsTitle>Quick Actions</ActionsTitle>

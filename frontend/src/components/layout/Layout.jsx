@@ -4,29 +4,24 @@ import Header from './Header';
 import Sidebar from './Sidebar';
 
 const LayoutContainer = styled.div`
-  display: flex;
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--color-surface);
 `;
 
 const MainContent = styled.main`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  
+  transition: margin-left 0.3s ease;
+  padding-top: var(--header-height, 64px);
+
   @media (min-width: 769px) {
-    margin-left: 280px;
+    margin-left: var(--sidebar-width, 280px);
   }
 `;
 
 const ContentArea = styled.div`
-  flex: 1;
-  padding: 20px;
-  margin-top: 64px;
-  overflow-y: auto;
+  padding: var(--space-5);
   
   @media (max-width: 768px) {
-    padding: 16px;
+    padding: var(--space-4);
   }
 `;
 
@@ -36,7 +31,7 @@ const LoadingOverlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,11 +42,11 @@ const LoadingOverlay = styled.div`
 const LoadingSpinner = styled.div`
   width: 40px;
   height: 40px;
-  border: 3px solid #e5e7eb;
-  border-top: 3px solid #3b82f6;
+  border: 3px solid var(--color-border);
+  border-top: 3px solid var(--color-primary-500);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -59,36 +54,36 @@ const LoadingSpinner = styled.div`
 `;
 
 const ErrorBoundary = styled.div`
-  padding: 40px 20px;
+  padding: var(--space-10) var(--space-5);
   text-align: center;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  margin: 20px;
+  background-color: var(--color-error-50);
+  border: 1px solid var(--color-error-200);
+  border-radius: var(--border-radius-lg);
+  margin: var(--space-5);
 `;
 
 const ErrorTitle = styled.h2`
-  color: #dc2626;
-  margin: 0 0 12px 0;
+  color: var(--color-error-600);
+  margin: 0 0 var(--space-3) 0;
   font-size: 1.25rem;
 `;
 
 const ErrorMessage = styled.p`
-  color: #7f1d1d;
-  margin: 0 0 20px 0;
+  color: var(--color-error-800);
+  margin: 0 0 var(--space-5) 0;
 `;
 
 const RetryButton = styled.button`
-  background-color: #dc2626;
+  background-color: var(--color-error-600);
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--border-radius-md);
   cursor: pointer;
   font-weight: 500;
-  
+
   &:hover {
-    background-color: #b91c1c;
+    background-color: var(--color-error-700);
   }
 `;
 
