@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Navigation from './Navigation';
+import { useApp } from '../../context/AppContext';
 
 const SidebarContainer = styled.aside`
   width: var(--sidebar-width, 280px);
@@ -170,6 +171,8 @@ const Sidebar = ({
     todayTasks: 0
   }
 }) => {
+  const { setActiveRoute, openTaskForm, openHabitForm } = useApp();
+
   const taskCounts = {
     total: stats.totalTasks,
     overdue: stats.overdueTasks,
@@ -182,12 +185,8 @@ const Sidebar = ({
     today: stats.todayHabits
   };
 
-  const completionRate = stats.totalTasks > 0 
-    ? Math.round((stats.completedTasks / stats.totalTasks) * 100) 
-    : 0;
-
   const handleNavigate = (route) => {
-    onNavigate && onNavigate(route);
+    setActiveRoute(route);
     // Close sidebar on mobile after navigation
     if (window.innerWidth <= 768) {
       onClose && onClose();
@@ -195,7 +194,7 @@ const Sidebar = ({
   };
 
   const handleCreateTask = () => {
-    onCreateTask && onCreateTask();
+    openTaskForm();
     // Close sidebar on mobile
     if (window.innerWidth <= 768) {
       onClose && onClose();
@@ -203,7 +202,7 @@ const Sidebar = ({
   };
 
   const handleCreateHabit = () => {
-    onCreateHabit && onCreateHabit();
+    openHabitForm();
     // Close sidebar on mobile
     if (window.innerWidth <= 768) {
       onClose && onClose();

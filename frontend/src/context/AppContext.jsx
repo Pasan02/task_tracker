@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ConfirmDialog } from '../components/common';
 
 // Define action types
 const actionTypes = {
@@ -52,6 +54,7 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
   const prevPathRef = useRef(window.location.pathname);
+  const navigate = useNavigate();
 
   // Fix for the infinite loop - use a ref to track the current path
   useEffect(() => {
@@ -90,16 +93,87 @@ export const AppProvider = ({ children }) => {
     dispatch({ type: actionTypes.SET_THEME, payload: theme });
   }, []);
 
-  // Define setActiveRoute function correctly
+  // Enhanced setActiveRoute function that also navigates
   const setActiveRoute = useCallback((route) => {
     if (typeof route === 'string' && route !== state.activeRoute) {
-      prevPathRef.current = route;
-      dispatch({ type: actionTypes.SET_ACTIVE_ROUTE, payload: route });
+      // Ensure route starts with a slash for consistency
+      const normalizedRoute = route.startsWith('/') ? route : `/${route}`;
+      prevPathRef.current = normalizedRoute;
+      dispatch({ type: actionTypes.SET_ACTIVE_ROUTE, payload: normalizedRoute });
+      
+      // Actually navigate to the route using React Router
+      navigate(normalizedRoute);
     }
-  }, [state.activeRoute]);
+  }, [state.activeRoute, navigate]);
 
   const toggleSidebar = useCallback((isOpen) => {
     dispatch({ type: actionTypes.TOGGLE_SIDEBAR, payload: isOpen });
+  }, []);
+
+  // Dialog functionality for confirmations
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    onConfirm: () => {},
+    onCancel: () => {},
+    variant: 'primary'
+  });
+
+  const openConfirmDialog = useCallback((dialogConfig) => {
+    setConfirmDialog({
+      ...confirmDialog,
+      isOpen: true,
+      ...dialogConfig
+    });
+  }, [confirmDialog]);
+
+  const closeConfirmDialog = useCallback(() => {
+    setConfirmDialog({
+      ...confirmDialog,
+      isOpen: false
+    });
+  }, [confirmDialog]);
+
+  // Modal functionality
+  const [taskFormState, setTaskFormState] = useState({
+    isOpen: false,
+    task: null
+  });
+
+  const [habitFormState, setHabitFormState] = useState({
+    isOpen: false,
+    habit: null
+  });
+
+  const openTaskForm = useCallback((task = null) => {
+    setTaskFormState({
+      isOpen: true,
+      task
+    });
+  }, []);
+
+  const closeTaskForm = useCallback(() => {
+    setTaskFormState({
+      isOpen: false,
+      task: null
+    });
+  }, []);
+
+  const openHabitForm = useCallback((habit = null) => {
+    setHabitFormState({
+      isOpen: true,
+      habit
+    });
+  }, []);
+
+  const closeHabitForm = useCallback(() => {
+    setHabitFormState({
+      isOpen: false,
+      habit: null
+    });
   }, []);
 
   // Set theme on initial load and when theme changes
@@ -115,12 +189,36 @@ export const AppProvider = ({ children }) => {
     setUser,
     setTheme,
     setActiveRoute,
-    toggleSidebar
+    toggleSidebar,
+    // Dialog functionality
+    openConfirmDialog,
+    closeConfirmDialog,
+    confirmDialog,
+    // Modal functionality
+    openTaskForm,
+    closeTaskForm,
+    taskFormState,
+    openHabitForm,
+    closeHabitForm,
+    habitFormState
   };
 
   return (
     <AppContext.Provider value={value}>
       {children}
+      {/* Render global confirm dialog if needed */}
+      {confirmDialog.isOpen && (
+        <ConfirmDialog
+          isOpen={confirmDialog.isOpen}
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          confirmText={confirmDialog.confirmText}
+          cancelText={confirmDialog.cancelText}
+          onConfirm={confirmDialog.onConfirm}
+          onCancel={confirmDialog.onCancel || closeConfirmDialog}
+          variant={confirmDialog.variant}
+        />
+      )}
     </AppContext.Provider>
   );
 };

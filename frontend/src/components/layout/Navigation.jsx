@@ -1,10 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useApp } from '../../context/AppContext';
 
 const NavContainer = styled.nav`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  margin-bottom: var(--space-8);
 `;
 
 const NavItem = styled.button`
@@ -82,33 +81,35 @@ const Navigation = ({
     today: 0
   }
 }) => {
+  const { setActiveRoute } = useApp();
+  
   const navItems = [
     {
       id: 'dashboard',
       icon: '📊',
       label: 'Dashboard',
-      section: 'main'
+      route: '/dashboard'
     },
     {
       id: 'tasks',
       icon: '📋',
       label: 'All Tasks',
       badge: taskCounts.total > 0 ? taskCounts.total : null,
-      section: 'tasks'
+      route: '/tasks'
     },
     {
       id: 'tasks-today',
       icon: '📅',
       label: 'Today',
       badge: taskCounts.today > 0 ? taskCounts.today : null,
-      section: 'tasks'
+      route: '/tasks/today'
     },
     {
       id: 'tasks-upcoming',
       icon: '⏰',
       label: 'Upcoming',
       badge: taskCounts.upcoming > 0 ? taskCounts.upcoming : null,
-      section: 'tasks'
+      route: '/tasks/upcoming'
     },
     {
       id: 'tasks-overdue',
@@ -116,21 +117,21 @@ const Navigation = ({
       label: 'Overdue',
       badge: taskCounts.overdue > 0 ? taskCounts.overdue : null,
       badgeVariant: taskCounts.overdue > 0 ? 'danger' : 'default',
-      section: 'tasks'
+      route: '/tasks/overdue'
     },
     {
       id: 'habits',
       icon: '🎯',
       label: 'All Habits',
       badge: habitCounts.total > 0 ? habitCounts.total : null,
-      section: 'habits'
+      route: '/habits'
     },
     {
       id: 'habits-today',
       icon: '✅',
       label: 'Today\'s Habits',
       badge: habitCounts.today > 0 ? habitCounts.today : null,
-      section: 'habits'
+      route: '/habits/today'
     }
   ];
 
@@ -149,6 +150,7 @@ const Navigation = ({
   };
 
   const handleNavigation = (route) => {
+    setActiveRoute(route);
     if (onNavigate) {
       onNavigate(route);
     }
@@ -162,8 +164,8 @@ const Navigation = ({
           {items.map(item => (
             <NavItem
               key={item.id}
-              $active={activeRoute === item.id}
-              onClick={() => handleNavigation(item.id)}
+              $active={activeRoute === item.route}
+              onClick={() => handleNavigation(item.route)}
             >
               <NavIcon>{item.icon}</NavIcon>
               <NavLabel>{item.label}</NavLabel>

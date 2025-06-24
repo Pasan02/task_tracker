@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { TaskProvider } from './context/TaskContext';
@@ -7,72 +7,34 @@ import Layout from './components/layout/Layout';
 import DashboardPage from './pages/DashboardPage';
 import TasksPage from './pages/TasksPage';
 import HabitsPage from './pages/HabitsPage';
-import { useDarkMode } from './hooks/useDarkMode';
-import { useApp } from './context/AppContext';
-
-const AppContent = () => {
-  const {
-    activeRoute,
-    setActiveRoute,
-    toggleTheme,
-    isDarkMode,
-    searchQuery,
-    setSearchQuery,
-  } = useApp();
-
-  const handleNavigate = (route) => {
-    setActiveRoute(route);
-  };
-
-  const handleCreateTask = () => {
-    // Will be handled by context
-  };
-
-  const handleCreateHabit = () => {
-    // Will be handled by context
-  };
-
-  return (
-    <Router>
-      <Layout
-        activeRoute={activeRoute}
-        onNavigate={handleNavigate}
-        onCreateTask={handleCreateTask}
-        onCreateHabit={handleCreateHabit}
-        onToggleTheme={toggleTheme}
-        isDarkMode={isDarkMode}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      >
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/habits" element={<HabitsPage />} />
-        </Routes>
-      </Layout>
-    </Router>
-  );
-};
 
 function App() {
-  const [activeRoute, setActiveRoute] = useState('');
-
-  // Function to handle route changes
-  const handleRouteChange = () => {
-    // Your route change logic
-    // ...
-  }; // Make sure this closing bracket is present
-
   return (
-    <AppProvider>
-      <TaskProvider>
-        <HabitProvider>
-          <AppContent />
-        </HabitProvider>
-      </TaskProvider>
-    </AppProvider>
+    <Router>
+      <AppProvider>
+        <TaskProvider>
+          <HabitProvider>
+            <AppContent />
+          </HabitProvider>
+        </TaskProvider>
+      </AppProvider>
+    </Router>
   );
-} // Make sure this closing bracket is present
+}
+
+const AppContent = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  return (
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/habits" element={<HabitsPage />} />
+      </Routes>
+    </Layout>
+  );
+};
 
 export default App;

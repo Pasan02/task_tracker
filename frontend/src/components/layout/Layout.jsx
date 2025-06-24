@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import { useApp } from '../../context/AppContext';
+import { useTasks } from '../../context/TaskContext';
+import { useHabits } from '../../context/HabitContext';
+import TaskForm from '../tasks/TaskForm';
+import HabitForm from '../habits/HabitForm';
 
 const LayoutContainer = styled.div`
   min-height: 100vh;
@@ -11,6 +17,7 @@ const LayoutContainer = styled.div`
 const MainContent = styled.main`
   transition: margin-left 0.3s ease;
   padding-top: var(--header-height, 64px);
+  margin-left: ${({ $sidebarOpen }) => ($sidebarOpen ? 'var(--sidebar-width, 280px)' : '0')};
 
   @media (min-width: 769px) {
     margin-left: var(--sidebar-width, 280px);
@@ -89,10 +96,6 @@ const RetryButton = styled.button`
 
 const Layout = ({ 
   children,
-  activeRoute = 'dashboard',
-  onNavigate,
-  onCreateTask,
-  onCreateHabit,
   onToggleTheme,
   isDarkMode = false,
   searchQuery = '',
@@ -100,47 +103,61 @@ const Layout = ({
   loading = false,
   error = null,
   onRetry,
-  stats = {
-    totalTasks: 0,
-    completedTasks: 0,
-    totalHabits: 0,
-    todayHabits: 0,
-    overdueTasks: 0,
-    upcomingTasks: 0,
-    todayTasks: 0
-  },
   userName = 'User'
 }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+  const { 
+    sidebarOpen, 
+    toggleSidebar, 
+    activeRoute, 
+    setActiveRoute,
+    openTaskForm,
+    openHabitForm,
+    taskFormState,
+    habitFormState,
+    closeTaskForm,
+    closeHabitForm
+  } = useApp();
 
-  // Close sidebar when route changes on mobile
-  useEffect(() => {
-    if (window.innerWidth <= 768) {
-      setSidebarOpen(false);
-    }
-  }, [activeRoute]);
+  // Get task and habit stats for sidebar
+  const { 
+    tasks, 
+    getOverdueTasks, 
+    getUpcomingTasks,
+    getTodayTasks
+  } = useTasks();
+  
+  const { 
+    habits,
+    stats: habitStats
+  } = useHabits();
 
-  // Close sidebar when clicking outside on mobile
+  // Calculate sidebar stats (renamed to avoid conflict)
+  const sidebarStats = {
+    totalTasks: tasks.length,
+    completedTasks: tasks.filter(task => task.status === 'done').length,
+    totalHabits: habits.length,
+    todayHabits: habitStats.completedToday || 0, // Use stats instead of getTodaysHabits()
+    overdueTasks: getOverdueTasks().length,
+    upcomingTasks: getUpcomingTasks(7).length,
+    todayTasks: getTodayTasks().length
+  };
+
+  // Sync route when location changes - in a separate effect
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) {
-        setSidebarOpen(false);
+    const handleLocationChange = () => {
+      if (location.pathname !== activeRoute) {
+        setActiveRoute(location.pathname);
       }
     };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    
+    handleLocationChange(); // Call once on mount
+    
+  }, [location.pathname, activeRoute, setActiveRoute]);
 
   const handleToggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    toggleSidebar();
   };
-
-  const handleCloseSidebar = () => {
-    setSidebarOpen(false);
-  };
-
-  const pendingTasksCount = stats.overdueTasks + stats.todayTasks;
 
   if (error) {
     return (
@@ -166,33 +183,49 @@ const Layout = ({
         </LoadingOverlay>
       )}
       
-      <Header
-        onToggleSidebar={handleToggleSidebar}
-        onToggleTheme={onToggleTheme}
-        isDarkMode={isDarkMode}
-        searchQuery={searchQuery}
-        onSearchChange={onSearchChange}
-        onCreateTask={onCreateTask}
-        onCreateHabit={onCreateHabit}
-        pendingTasksCount={pendingTasksCount}
-        userName={userName}
-      />
-
       <Sidebar
         isOpen={sidebarOpen}
-        onClose={handleCloseSidebar}
+        onClose={() => toggleSidebar(false)}
         activeRoute={activeRoute}
-        onNavigate={onNavigate}
-        onCreateTask={onCreateTask}
-        onCreateHabit={onCreateHabit}
-        stats={stats}
+        onNavigate={setActiveRoute}
+        onCreateTask={openTaskForm}
+        onCreateHabit={openHabitForm}
+        stats={sidebarStats}
       />
-
-      <MainContent>
+      <MainContent $sidebarOpen={sidebarOpen}>
+        <Header 
+          onToggleSidebar={handleToggleSidebar}
+          onToggleTheme={onToggleTheme}
+          isDarkMode={isDarkMode}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+          onCreateTask={openTaskForm}
+          onCreateHabit={openHabitForm}
+          pendingTasksCount={sidebarStats.overdueTasks + sidebarStats.todayTasks}
+          userName={userName}
+        />
         <ContentArea>
           {children}
         </ContentArea>
       </MainContent>
+
+      {/* Task Form Modal */}
+      {taskFormState?.isOpen && (
+        <TaskForm
+          isOpen={taskFormState.isOpen}
+          onClose={closeTaskForm}
+          task={taskFormState.task}
+        />
+      )}
+
+      {/* Habit Form Modal */}
+      {habitFormState?.isOpen && (
+        <HabitForm
+          isOpen={habitFormState.isOpen}
+          onClose={closeHabitForm}
+          habit={habitFormState.habit}
+        />
+      )}
     </LayoutContainer>
   );
 };
