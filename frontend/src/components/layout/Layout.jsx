@@ -129,7 +129,9 @@ const Layout = ({
   
   const { 
     habits,
-    stats: habitStats
+    stats: habitStats,
+    createHabit,
+    updateHabit
   } = useHabits();
 
   // Calculate sidebar stats (renamed to avoid conflict)
@@ -157,6 +159,34 @@ const Layout = ({
 
   const handleToggleSidebar = () => {
     toggleSidebar();
+  };
+
+  // Add this function to handle task form submissions
+  const handleSubmitTask = async (taskData) => {
+    try {
+      if (taskFormState.task) {
+        await updateTask(taskFormState.task.id, taskData);
+      } else {
+        await createTask(taskData);
+      }
+      closeTaskForm();
+    } catch (error) {
+      console.error('Failed to save task:', error);
+    }
+  };
+
+  // Add the handleSubmitHabit function just after handleSubmitTask
+  const handleSubmitHabit = async (habitData) => {
+    try {
+      if (habitFormState.habit) {
+        await updateHabit(habitFormState.habit.id, habitData);
+      } else {
+        await createHabit(habitData);
+      }
+      closeHabitForm();
+    } catch (error) {
+      console.error('Failed to save habit:', error);
+    }
   };
 
   if (error) {
@@ -215,6 +245,7 @@ const Layout = ({
           isOpen={taskFormState.isOpen}
           onClose={closeTaskForm}
           task={taskFormState.task}
+          onSubmit={handleSubmitTask}
         />
       )}
 
@@ -224,6 +255,7 @@ const Layout = ({
           isOpen={habitFormState.isOpen}
           onClose={closeHabitForm}
           habit={habitFormState.habit}
+          onSubmit={handleSubmitHabit}  // Add a similar handler function for habits
         />
       )}
     </LayoutContainer>

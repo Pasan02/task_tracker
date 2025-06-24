@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Button } from '../common';
+import { Button, Modal } from '../common';
 
 const Form = styled.form`
   display: flex;
@@ -92,9 +92,10 @@ const HelpText = styled.span`
 `;
 
 const HabitForm = ({ 
+  isOpen = false,  // Added isOpen prop
   habit = null, 
-  onSubmit, 
-  onCancel, 
+  onSubmit,
+  onClose,  // Changed from onCancel to onClose for consistency
   loading = false 
 }) => {
   const [formData, setFormData] = useState({
@@ -168,99 +169,106 @@ const HabitForm = ({
     onSubmit(habitData);
   };
 
+  // Wrap the form with Modal component, just like TaskForm
   return (
-    <Form onSubmit={handleSubmit}>
-      <FormGroup>
-        <Label htmlFor="title">Habit Name *</Label>
-        <Input
-          id="title"
-          name="title"
-          type="text"
-          value={formData.title}
-          onChange={handleInputChange}
-          placeholder="e.g., Drink 8 glasses of water"
-          required
-        />
-        {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>}
-      </FormGroup>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={habit ? 'Edit Habit' : 'Create New Habit'}
+    >
+      <Form onSubmit={handleSubmit}>
+        <FormGroup>
+          <Label htmlFor="title">Habit Name *</Label>
+          <Input
+            id="title"
+            name="title"
+            type="text"
+            value={formData.title}
+            onChange={handleInputChange}
+            placeholder="e.g., Drink 8 glasses of water"
+            required
+          />
+          {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>}
+        </FormGroup>
 
-      <FormGroup>
-        <Label htmlFor="description">Description</Label>
-        <TextArea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="Add details about your habit (optional)"
-        />
-      </FormGroup>
+        <FormGroup>
+          <Label htmlFor="description">Description</Label>
+          <TextArea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Add details about your habit (optional)"
+          />
+        </FormGroup>
 
-      <FormGroup>
-        <Label htmlFor="frequency">Frequency</Label>
-        <Select
-          id="frequency"
-          name="frequency"
-          value={formData.frequency}
-          onChange={handleInputChange}
-        >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-        </Select>
-        <HelpText>
-          {formData.frequency === 'daily' 
-            ? 'Track this habit every day' 
-            : 'Track this habit once per week'
-          }
-        </HelpText>
-      </FormGroup>
+        <FormGroup>
+          <Label htmlFor="frequency">Frequency</Label>
+          <Select
+            id="frequency"
+            name="frequency"
+            value={formData.frequency}
+            onChange={handleInputChange}
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </Select>
+          <HelpText>
+            {formData.frequency === 'daily' 
+              ? 'Track this habit every day' 
+              : 'Track this habit once per week'
+            }
+          </HelpText>
+        </FormGroup>
 
-      <FormGroup>
-        <Label htmlFor="targetCount">Target Count</Label>
-        <Input
-          id="targetCount"
-          name="targetCount"
-          type="number"
-          min="1"
-          max="100"
-          value={formData.targetCount}
-          onChange={handleInputChange}
-        />
-        <HelpText>
-          How many times per {formData.frequency === 'daily' ? 'day' : 'week'} do you want to complete this habit?
-        </HelpText>
-        {errors.targetCount && <ErrorMessage>{errors.targetCount}</ErrorMessage>}
-      </FormGroup>
+        <FormGroup>
+          <Label htmlFor="targetCount">Target Count</Label>
+          <Input
+            id="targetCount"
+            name="targetCount"
+            type="number"
+            min="1"
+            max="100"
+            value={formData.targetCount}
+            onChange={handleInputChange}
+          />
+          <HelpText>
+            How many times per {formData.frequency === 'daily' ? 'day' : 'week'} do you want to complete this habit?
+          </HelpText>
+          {errors.targetCount && <ErrorMessage>{errors.targetCount}</ErrorMessage>}
+        </FormGroup>
 
-      <FormGroup>
-        <Label htmlFor="category">Category</Label>
-        <Input
-          id="category"
-          name="category"
-          type="text"
-          value={formData.category}
-          onChange={handleInputChange}
-          placeholder="e.g., Health, Productivity, Learning"
-        />
-      </FormGroup>
+        <FormGroup>
+          <Label htmlFor="category">Category</Label>
+          <Input
+            id="category"
+            name="category"
+            type="text"
+            value={formData.category}
+            onChange={handleInputChange}
+            placeholder="e.g., Health, Productivity, Learning"
+          />
+        </FormGroup>
 
-      <FormActions>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onCancel}
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          loading={loading}
-        >
-          {habit ? 'Update Habit' : 'Create Habit'}
-        </Button>
-      </FormActions>
-    </Form>
+        <FormActions>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}  // Changed from onCancel to onClose
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            loading={loading}
+          >
+            {habit ? 'Update Habit' : 'Create Habit'}
+          </Button>
+        </FormActions>
+      </Form>
+    </Modal>
   );
 };
 

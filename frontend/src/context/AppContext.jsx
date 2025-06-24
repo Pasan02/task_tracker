@@ -88,10 +88,53 @@ export const AppProvider = ({ children }) => {
     dispatch({ type: actionTypes.SET_USER, payload: user });
   }, []);
 
+  // Update the theme-related functions in AppContext
+
+  // In the setTheme function, make sure it updates localStorage and the DOM
   const setTheme = useCallback((theme) => {
-    localStorage.setItem('theme', theme);
-    dispatch({ type: actionTypes.SET_THEME, payload: theme });
+    if (theme === 'dark' || theme === 'light') {
+      localStorage.setItem('theme', theme);
+      document.documentElement.setAttribute('data-theme', theme);
+      dispatch({ type: actionTypes.SET_THEME, payload: theme });
+    }
   }, []);
+
+  // Update the toggleTheme function
+  const toggleTheme = useCallback(() => {
+    const newTheme = state.theme === 'dark' ? 'light' : 'dark';
+    
+    // Add a transitioning class
+    document.documentElement.classList.add('theme-transitioning');
+    document.body.classList.add('theme-transitioning');
+    
+    // Set data-theme attribute
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    // Also toggle body class for redundancy
+    if (newTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    
+    // Update localStorage
+    localStorage.setItem('theme', newTheme);
+    
+    // Update state
+    dispatch({ type: actionTypes.SET_THEME, payload: newTheme });
+    
+    // Force a repaint to make the change immediate
+    const bodyStyles = window.getComputedStyle(document.body);
+    const _ = bodyStyles.backgroundColor;
+    
+    // Remove transition prevention class after changes are applied
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+      document.body.classList.remove('theme-transitioning');
+    }, 100);
+    
+    console.log('Theme changed to:', newTheme);
+  }, [state.theme]);
 
   // Enhanced setActiveRoute function that also navigates
   const setActiveRoute = useCallback((route) => {
@@ -181,6 +224,25 @@ export const AppProvider = ({ children }) => {
     document.documentElement.setAttribute('data-theme', state.theme);
   }, [state.theme]);
 
+  // Add this useEffect at the top of your AppProvider component
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    
+    // Set the theme on initial load
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    if (savedTheme === 'dark') {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    
+    // If the stored theme differs from the state, update the state
+    if (savedTheme !== state.theme) {
+      dispatch({ type: actionTypes.SET_THEME, payload: savedTheme });
+    }
+  }, []);
+
   const value = {
     ...state,
     setLoading,
@@ -188,6 +250,7 @@ export const AppProvider = ({ children }) => {
     clearError,
     setUser,
     setTheme,
+    toggleTheme, // Add this
     setActiveRoute,
     toggleSidebar,
     // Dialog functionality

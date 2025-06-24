@@ -235,3 +235,19 @@
 .theme-transitioning * {
   transition: none !important;
 }
+
+/* Add this class to ensure dark mode is properly applied */
+body.dark-mode {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Make the theme transition more specific and forceful */
+[data-theme="dark"] {
+  --color-background: #0f172a !important;
+  --color-surface: #1e293b !important;
+  --color-card: #1e293b !important;
+  --color-text-primary: #f8fafc !important;
+  --color-text-secondary: #cbd5e1 !important;
+  /* Add other dark mode variables with !important to ensure they override */
+}

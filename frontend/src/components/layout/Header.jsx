@@ -249,6 +249,26 @@ const MobileSearchButton = styled.button`
   }
 `;
 
+const ThemeToggleButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  margin-left: 8px;
+  padding: 8px;
+  border-radius: var(--border-radius-md);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: var(--color-hover);
+    color: var(--color-text-primary);
+  }
+`;
+
 const Header = ({ 
   onToggleSidebar,
   onToggleTheme,
@@ -269,6 +289,14 @@ const Header = ({
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     // Handle search functionality
+  };
+
+  // Handle theme toggle with logging to verify it's working
+  const handleToggleTheme = () => {
+    console.log('Toggling theme from', isDarkMode ? 'dark' : 'light');
+    if (onToggleTheme) {
+      onToggleTheme();
+    }
   };
 
   return (
@@ -320,11 +348,13 @@ const Header = ({
           </Button>
         </QuickActions>
 
-        <NotificationBadge $hasNotifications={pendingTasksCount > 0}>
-          <ThemeToggle onClick={onToggleTheme}>
-            {isDarkMode ? '☀️' : '🌙'}
-          </ThemeToggle>
-        </NotificationBadge>
+        {/* Keep ONLY this theme toggle button */}
+        <ThemeToggleButton 
+          onClick={handleToggleTheme} 
+          title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {isDarkMode ? '☀️' : '🌙'}
+        </ThemeToggleButton>
 
         <ProfileSection>
           <Avatar>
@@ -340,6 +370,8 @@ const Header = ({
             </UserStatus>
           </UserInfo>
         </ProfileSection>
+
+        {/* Remove the second theme toggle button that was here */}
       </RightSection>
     </HeaderContainer>
   );
