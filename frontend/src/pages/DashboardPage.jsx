@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Dashboard from '../components/dashboard/Dashboard';
 import useTasks from '../hooks/useTasks'; // Changed from named import to default import
@@ -86,9 +86,16 @@ const DashboardPage = () => {
     setActiveRoute
   } = useApp();
 
+  const hasSetRoute = useRef(false);
+
   // Set active route when component mounts
   useEffect(() => {
-    setActiveRoute('dashboard');
+    // Only set the route once when the component mounts
+    if (!hasSetRoute.current) {
+      hasSetRoute.current = true;
+      setActiveRoute('/dashboard');
+    }
+    // Empty dependency array to ensure this only runs once on mount
   }, [setActiveRoute]);
 
   // Handle loading states

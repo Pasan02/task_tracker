@@ -3,110 +3,127 @@ import styled from 'styled-components';
 import { Button } from '../common';
 
 const SummaryCard = styled.div`
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 `;
 
 const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 `;
 
 const CardTitle = styled.h3`
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 `;
 
 const AddButton = styled.button`
   background: none;
-  border: 1px solid #d1d5db;
-  color: #6b7280;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-500);
+    background-color: var(--color-hover);
   }
 `;
 
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 `;
 
 const StatItem = styled.div`
   text-align: center;
-  padding: 16px;
-  border-radius: 8px;
-  background-color: ${props => props.$bgColor || '#f9fafb'};
+  padding: var(--space-4);
+  border-radius: var(--border-radius-md);
+  background-color: ${props => props.$bgColor || 'var(--color-surface)'};
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
 `;
 
 const StatNumber = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${props => props.$color || '#111827'};
-  margin-bottom: 4px;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: ${props => props.$color || 'var(--color-text-primary)'};
+  margin-bottom: var(--space-1);
 `;
 
 const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 `;
 
 const TodayHabits = styled.div`
-  margin-top: 20px;
+  margin-top: var(--space-5);
 `;
 
 const SectionTitle = styled.h4`
-  margin: 0 0 12px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
+  margin: 0 0 var(--space-3) 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 `;
 
 const HabitsList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 `;
 
 const HabitItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  border-radius: 6px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  padding: var(--space-3);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: var(--color-primary-300);
+    background-color: var(--color-hover);
+  }
 `;
 
 const HabitName = styled.span`
-  font-size: 0.875rem;
-  color: #374151;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
 `;
 
 const CheckButton = styled.button`
   width: 24px;
   height: 24px;
-  border: 2px solid ${props => props.$completed ? '#10b981' : '#d1d5db'};
+  border: 2px solid ${props => props.$completed ? 'var(--color-success)' : 'var(--color-border)'};
   border-radius: 50%;
-  background: ${props => props.$completed ? '#10b981' : 'white'};
-  color: ${props => props.$completed ? 'white' : '#6b7280'};
+  background: ${props => props.$completed ? 'var(--color-success)' : 'white'};
+  color: ${props => props.$completed ? 'white' : 'var(--color-text-secondary)'};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -115,7 +132,7 @@ const CheckButton = styled.button`
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #10b981;
+    border-color: var(--color-success);
     transform: scale(1.1);
   }
 `;
@@ -123,7 +140,7 @@ const CheckButton = styled.button`
 const EmptyState = styled.div`
   text-align: center;
   padding: 20px;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
 `;
 
@@ -132,7 +149,7 @@ const StreakInfo = styled.div`
   justify-content: space-between;
   margin-top: 16px;
   padding: 12px;
-  background-color: #fef3c7;
+  background-color: var(--color-warning);
   border-radius: 6px;
 `;
 

@@ -2,103 +2,106 @@ import React from 'react';
 import styled from 'styled-components';
 
 const SummaryCard = styled.div`
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 `;
 
 const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-4);
 `;
 
 const CardTitle = styled.h3`
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 `;
 
 const AddButton = styled.button`
   background: none;
-  border: 1px solid #d1d5db;
-  color: #6b7280;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-500);
+    background-color: var(--color-hover);
   }
 `;
 
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 `;
 
 const StatItem = styled.div`
   text-align: center;
-  padding: 16px;
-  border-radius: 8px;
-  background-color: ${props => props.$bgColor || '#f9fafb'};
+  padding: var(--space-4);
+  border-radius: var(--border-radius-md);
+  background-color: ${props => props.$bgColor || 'var(--color-surface)'};
 `;
 
 const StatNumber = styled.div`
-  font-size: 2rem;
-  font-weight: 700;
-  color: ${props => props.$color || '#111827'};
-  margin-bottom: 4px;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: ${props => props.$color || 'var(--color-text-primary)'};
+  margin-bottom: var(--space-1);
 `;
 
 const StatLabel = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
 `;
 
 const ProgressBar = styled.div`
   width: 100%;
-  height: 8px;
-  background-color: #f3f4f6;
-  border-radius: 4px;
+  height: var(--space-2);
+  background-color: var(--color-border-light);
+  border-radius: var(--border-radius-sm);
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-2);
 `;
 
 const ProgressFill = styled.div`
   height: 100%;
-  background-color: #10b981;
+  background-color: var(--color-success-500);
   width: ${props => props.$percentage}%;
   transition: width 0.3s ease;
 `;
 
 const ProgressText = styled.div`
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   text-align: center;
 `;
 
 const PriorityBreakdown = styled.div`
   display: flex;
-  gap: 8px;
-  margin-top: 16px;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
 `;
 
 const PriorityItem = styled.div`
   flex: 1;
   text-align: center;
-  padding: 8px;
-  border-radius: 6px;
+  padding: var(--space-3);
+  border-radius: var(--border-radius-md);
   background-color: ${props => props.$bgColor};
   border: 1px solid ${props => props.$borderColor};
 `;

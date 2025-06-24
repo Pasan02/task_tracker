@@ -3,181 +3,207 @@ import styled from 'styled-components';
 import { Button } from '../common';
 
 const TasksCard = styled.div`
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 `;
 
 const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 `;
 
 const CardTitle = styled.h3`
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 `;
 
 const TaskCount = styled.span`
-  background-color: ${props => props.$count > 0 ? '#fee2e2' : '#dcfce7'};
-  color: ${props => props.$count > 0 ? '#dc2626' : '#16a34a'};
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  background-color: ${props => props.$count > 0 ? 'var(--color-error-100)' : 'var(--color-success-100)'};
+  color: ${props => props.$count > 0 ? 'var(--color-error-700)' : 'var(--color-success-700)'};
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
 `;
 
 const TasksList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   max-height: 400px;
   overflow-y: auto;
+  padding-right: var(--space-2);
+  
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: var(--color-surface);
+    border-radius: var(--border-radius-full);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+    border-radius: var(--border-radius-full);
+    
+    &:hover {
+      background: var(--color-gray-400);
+    }
+  }
 `;
 
 const TaskItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 16px;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  background-color: #fef2f2;
+  padding: var(--space-4);
+  border: 1px solid var(--color-error-200);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-error-50);
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #f87171;
-    background-color: #fee2e2;
+    border-color: var(--color-error-300);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
   }
 `;
 
 const TaskContent = styled.div`
   flex: 1;
-  margin-right: 12px;
+  margin-right: var(--space-3);
 `;
 
 const TaskTitle = styled.h4`
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #111827;
+  margin: 0 0 var(--space-1) 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 `;
 
 const TaskMeta = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
-  font-size: 0.875rem;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
 `;
 
 const MetaItem = styled.span`
-  color: #6b7280;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-1);
 `;
 
 const PriorityBadge = styled.span`
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   
   ${props => {
     switch (props.$priority) {
       case 'high':
         return `
-          background-color: #fee2e2;
-          color: #dc2626;
+          background-color: var(--color-error-100);
+          color: var(--color-error-700);
         `;
       case 'medium':
         return `
-          background-color: #fef3c7;
-          color: #d97706;
+          background-color: var(--color-warning-100);
+          color: var(--color-warning-700);
         `;
       case 'low':
         return `
-          background-color: #dcfce7;
-          color: #16a34a;
+          background-color: var(--color-success-100);
+          color: var(--color-success-700);
         `;
       default:
         return `
-          background-color: #f3f4f6;
-          color: #6b7280;
+          background-color: var(--color-gray-200);
+          color: var(--color-text-secondary);
         `;
     }
   }}
 `;
 
 const OverdueDate = styled.span`
-  color: #dc2626;
-  font-weight: 500;
+  color: var(--color-error-700);
+  font-weight: var(--font-weight-medium);
 `;
 
 const OverdueDays = styled.span`
-  background-color: #dc2626;
+  background-color: var(--color-error-700);
   color: white;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 `;
 
 const TaskActions = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
 `;
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: 40px 20px;
-  color: #6b7280;
+  padding: var(--space-10) var(--space-5);
+  color: var(--color-text-secondary);
 `;
 
 const EmptyIcon = styled.div`
   font-size: 3rem;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 `;
 
 const EmptyTitle = styled.h4`
-  margin: 0 0 8px 0;
-  font-size: 1.125rem;
-  font-weight: 500;
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
 `;
 
 const EmptyMessage = styled.p`
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 `;
 
 const UrgentAlert = styled.div`
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  padding: 12px;
-  margin-bottom: 16px;
+  background-color: var(--color-warning-50);
+  border: 1px solid var(--color-warning-200);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-5);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-3);
 `;
 
 const AlertIcon = styled.span`
-  color: #dc2626;
+  color: var(--color-warning-700);
   font-size: 1.25rem;
 `;
 
 const AlertText = styled.span`
-  color: #dc2626;
-  font-size: 0.875rem;
-  font-weight: 500;
+  color: var(--color-warning-700);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 `;
 
 const calculateDaysOverdue = (dueDate) => {

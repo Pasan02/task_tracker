@@ -70,7 +70,13 @@ const QuickActionsContainer = styled.div`
   background: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
-  padding: var(--space-5);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
 `;
 
 const QuickActions = styled.div`
@@ -83,28 +89,38 @@ const ActionButton = styled.button`
   background-color: var(--color-primary-500);
   color: white;
   border: none;
-  padding: var(--space-3) var(--space-6);
+  padding: var(--space-3) var(--space-5);
   border-radius: var(--border-radius-md);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 
   &:hover {
     background-color: var(--color-primary-600);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-focus);
   }
 `;
 
 const ErrorMessage = styled.div`
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
+  background-color: var(--color-error-50);
+  border: 1px solid var(--color-error-200);
+  color: var(--color-error-600);
   padding: var(--space-4);
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
   margin-bottom: var(--space-5);
 `;
 

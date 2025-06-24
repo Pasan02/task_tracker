@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { TaskProvider } from './context/TaskContext';
@@ -10,17 +10,15 @@ import HabitsPage from './pages/HabitsPage';
 import { useDarkMode } from './hooks/useDarkMode';
 import { useApp } from './context/AppContext';
 
-
 const AppContent = () => {
   const {
     activeRoute,
     setActiveRoute,
+    toggleTheme,
+    isDarkMode,
     searchQuery,
     setSearchQuery,
-    isDarkMode
   } = useApp();
-
-  const { toggle: toggleTheme } = useDarkMode();
 
   const handleNavigate = (route) => {
     setActiveRoute(route);
@@ -58,6 +56,14 @@ const AppContent = () => {
 };
 
 function App() {
+  const [activeRoute, setActiveRoute] = useState('');
+
+  // Function to handle route changes
+  const handleRouteChange = () => {
+    // Your route change logic
+    // ...
+  }; // Make sure this closing bracket is present
+
   return (
     <AppProvider>
       <TaskProvider>
@@ -67,6 +73,6 @@ function App() {
       </TaskProvider>
     </AppProvider>
   );
-}
+} // Make sure this closing bracket is present
 
 export default App;

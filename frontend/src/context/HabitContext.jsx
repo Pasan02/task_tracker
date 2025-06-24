@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import habitService from '../services/habitService';
 import { useApp } from './AppContext';
 import { formatDateForInput } from '../utils/dateHelpers';
@@ -43,38 +43,15 @@ const actionTypes = {
 const habitReducer = (state, action) => {
   switch (action.type) {
     case actionTypes.SET_LOADING:
-      return {
-        ...state,
-        loading: action.payload
-      };
-      
+      return { ...state, loading: action.payload };
     case actionTypes.SET_ERROR:
-      return {
-        ...state,
-        error: action.payload,
-        loading: false
-      };
-      
+      return { ...state, error: action.payload, loading: false };
     case actionTypes.CLEAR_ERROR:
-      return {
-        ...state,
-        error: null
-      };
-      
+      return { ...state, error: null };
     case actionTypes.SET_HABITS:
-      return {
-        ...state,
-        habits: action.payload,
-        loading: false,
-        error: null
-      };
-      
+      return { ...state, habits: action.payload, loading: false, error: null };
     case actionTypes.ADD_HABIT:
-      return {
-        ...state,
-        habits: [...state.habits, action.payload]
-      };
-      
+      return { ...state, habits: [...state.habits, action.payload] };
     case actionTypes.UPDATE_HABIT:
       return {
         ...state,
@@ -82,31 +59,17 @@ const habitReducer = (state, action) => {
           habit.id === action.payload.id ? action.payload : habit
         )
       };
-      
     case actionTypes.DELETE_HABIT:
       return {
         ...state,
         habits: state.habits.filter(habit => habit.id !== action.payload)
       };
-      
     case actionTypes.SET_STATS:
-      return {
-        ...state,
-        stats: action.payload
-      };
-      
+      return { ...state, stats: action.payload };
     case actionTypes.SET_CATEGORIES:
-      return {
-        ...state,
-        categories: action.payload
-      };
-      
+      return { ...state, categories: action.payload };
     case actionTypes.SET_INITIALIZED:
-      return {
-        ...state,
-        initialized: action.payload
-      };
-      
+      return { ...state, initialized: action.payload };
     default:
       return state;
   }
@@ -119,285 +82,312 @@ const HabitContext = createContext();
 export const HabitProvider = ({ children }) => {
   const [state, dispatch] = useReducer(habitReducer, initialState);
   const { setError: setAppError, clearError: clearAppError } = useApp();
+  const habitsRef = useRef(null);
 
-  // Helper to update stats and categories
-  const updateDerivedData = useCallback(async (habits) => {
-    try {
-      const stats = await habitService.getHabitStatistics();
-      const categories = [...new Set(habits
-        .map(habit => habit.category)
-        .filter(category => category && category.trim() !== '')
-      )].sort();
-      
-      dispatch({ type: actionTypes.SET_STATS, payload: stats });
-      dispatch({ type: actionTypes.SET_CATEGORIES, payload: categories });
-    } catch (error) {
-      console.error('Error updating derived data:', error);
-    }
-  }, []);
-
-  // Load habits on mount
+  // Effect for the initial load of habits.
   useEffect(() => {
-    const loadHabits = async () => {
+    if (state.initialized) return;
+    
+    let isMounted = true;
+    const loadInitialData = async () => {
+      dispatch({ type: actionTypes.SET_LOADING, payload: true });
       try {
-        dispatch({ type: actionTypes.SET_LOADING, payload: true });
         const habits = await habitService.getAllHabits();
-        dispatch({ type: actionTypes.SET_HABITS, payload: habits });
-        await updateDerivedData(habits);
-        dispatch({ type: actionTypes.SET_INITIALIZED, payload: true });
+        
+        if (isMounted) {
+          habitsRef.current = JSON.stringify(habits);
+          
+          // Calculate derived data immediately
+          const today = formatDateForInput(new Date());
+          const newStats = {
+            totalHabits: habits.length,
+            activeHabits: habits.filter(h => h.frequency).length,
+            completedToday: habits.filter(h => h.completions?.includes(today)).length,
+            totalCompletions: habits.reduce((sum, h) => sum + (h.completions?.length || 0), 0),
+            longestStreak: calculateMaxLongestStreak(habits),
+            currentStreaks: habits.map(h => ({ 
+              habitId: h.id, 
+              habitTitle: h.title, 
+              streak: calculateCurrentStreak(h) 
+            })),
+            habitBreakdown: habits.reduce((breakdown, h) => {
+              if (h.frequency === 'daily') breakdown.daily++;
+              if (h.frequency === 'weekly') breakdown.weekly++;
+              return breakdown;
+            }, { daily: 0, weekly: 0 })
+          };
+          
+          newStats.completionRate = newStats.totalHabits > 0 ? 
+            Math.round((newStats.completedToday / newStats.totalHabits) * 100) : 0;
+
+          const newCategories = [...new Set(habits
+            .map(h => h.category)
+            .filter(c => c && c.trim() !== '')
+          )].sort();
+          
+          dispatch({ type: actionTypes.SET_HABITS, payload: habits });
+          dispatch({ type: actionTypes.SET_STATS, payload: newStats });
+          dispatch({ type: actionTypes.SET_CATEGORIES, payload: newCategories });
+          dispatch({ type: actionTypes.SET_INITIALIZED, payload: true });
+        }
       } catch (error) {
-        const errorMessage = error.message || 'Failed to load habits';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
+        if (isMounted) {
+          const errorMessage = error.message || 'Failed to load habits';
+          dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
+          setAppError(errorMessage);
+        }
+      } finally {
+        if (isMounted) {
+          dispatch({ type: actionTypes.SET_LOADING, payload: false });
+        }
       }
     };
+    
+    loadInitialData();
 
-    loadHabits();
-  }, [setAppError, updateDerivedData]);
+    return () => {
+      isMounted = false;
+    };
+  }, [state.initialized, setAppError]);
 
-  // Update derived data when habits change
-  useEffect(() => {
-    if (state.initialized && state.habits.length >= 0) {
-      updateDerivedData(state.habits);
-    }
-  }, [state.habits, state.initialized, updateDerivedData]);
-
-  // Action creators
-  const actions = {
-    // Create a new habit
-    createHabit: async (habitData) => {
-      try {
-        dispatch({ type: actionTypes.SET_LOADING, payload: true });
-        clearAppError();
-        
-        const newHabit = await habitService.createHabit(habitData);
-        dispatch({ type: actionTypes.ADD_HABIT, payload: newHabit });
-        
-        return newHabit;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to create habit';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      } finally {
-        dispatch({ type: actionTypes.SET_LOADING, payload: false });
-      }
-    },
-
-    // Update an existing habit
-    updateHabit: async (habitId, updates) => {
-      try {
-        dispatch({ type: actionTypes.SET_LOADING, payload: true });
-        clearAppError();
-        
-        const updatedHabit = await habitService.updateHabitDetails(habitId, updates);
-        dispatch({ type: actionTypes.UPDATE_HABIT, payload: updatedHabit });
-        
-        return updatedHabit;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to update habit';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      } finally {
-        dispatch({ type: actionTypes.SET_LOADING, payload: false });
-      }
-    },
-
-    // Delete a habit
-    deleteHabit: async (habitId) => {
-      try {
-        dispatch({ type: actionTypes.SET_LOADING, payload: true });
-        clearAppError();
-        
-        await habitService.deleteHabit(habitId);
-        dispatch({ type: actionTypes.DELETE_HABIT, payload: habitId });
-        
-        return true;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to delete habit';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      } finally {
-        dispatch({ type: actionTypes.SET_LOADING, payload: false });
-      }
-    },
-
-    // Toggle habit completion for a specific date
-    toggleHabitCompletion: async (habitId, dateString) => {
-      try {
-        clearAppError();
-        
-        const updatedHabit = await habitService.toggleHabitCompletion(habitId, dateString);
-        dispatch({ type: actionTypes.UPDATE_HABIT, payload: updatedHabit });
-        
-        return updatedHabit;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to toggle habit completion';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      }
-    },
-
-    // Mark habit as complete for today
-    markHabitCompleteToday: async (habitId) => {
-      const today = formatDateForInput(new Date());
-      return actions.toggleHabitCompletion(habitId, today);
-    },
-
-    // Get today's habits with completion status
-    getTodaysHabits: async () => {
-      try {
-        clearAppError();
-        
-        const todaysHabits = await habitService.getTodaysHabits();
-        return todaysHabits;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to get today\'s habits';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      }
-    },
-
-    // Get habit calendar data
-    getHabitCalendarData: async (habitId, year, month) => {
-      try {
-        clearAppError();
-        
-        const calendarData = await habitService.getHabitCalendarData(habitId, year, month);
-        return calendarData;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to get habit calendar data';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      }
-    },
-
-    // Get filtered habits
-    getFilteredHabits: (filters) => {
-      const { habits } = state;
-      
-      return habits.filter(habit => {
-        // Search filter
-        if (filters.search) {
-          const searchTerm = filters.search.toLowerCase();
-          const matchesTitle = habit.title?.toLowerCase().includes(searchTerm);
-          const matchesDescription = habit.description?.toLowerCase().includes(searchTerm);
-          const matchesCategory = habit.category?.toLowerCase().includes(searchTerm);
-          
-          if (!matchesTitle && !matchesDescription && !matchesCategory) {
-            return false;
-          }
-        }
-        
-        // Frequency filter
-        if (filters.frequency && filters.frequency !== 'all') {
-          if (habit.frequency !== filters.frequency) return false;
-        }
-        
-        // Category filter
-        if (filters.category && filters.category !== 'all') {
-          if (habit.category !== filters.category) return false;
-        }
-        
-        // Completed today filter
-        if (filters.completedToday && filters.completedToday !== 'all') {
-          const today = formatDateForInput(new Date());
-          const isCompleted = habit.completions && habit.completions.includes(today);
-          
-          if (filters.completedToday === 'yes' && !isCompleted) return false;
-          if (filters.completedToday === 'no' && isCompleted) return false;
-        }
-        
-        return true;
-      });
-    },
-
-    // Refresh habits from service
-    refreshHabits: async () => {
-      try {
-        dispatch({ type: actionTypes.SET_LOADING, payload: true });
-        clearAppError();
-        
-        const habits = await habitService.getAllHabits();
-        dispatch({ type: actionTypes.SET_HABITS, payload: habits });
-        
-        return habits;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to refresh habits';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      } finally {
-        dispatch({ type: actionTypes.SET_LOADING, payload: false });
-      }
-    },
-
-    // Export habits
-    exportHabits: async () => {
-      try {
-        clearAppError();
-        
-        const jsonData = await habitService.exportHabits();
-        return jsonData;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to export habits';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      }
-    },
-
-    // Import habits
-    importHabits: async (jsonData) => {
-      try {
-        dispatch({ type: actionTypes.SET_LOADING, payload: true });
-        clearAppError();
-        
-        const importedHabits = await habitService.importHabits(jsonData);
-        
-        // Refresh all habits after import
-        const allHabits = await habitService.getAllHabits();
-        dispatch({ type: actionTypes.SET_HABITS, payload: allHabits });
-        
-        return importedHabits;
-      } catch (error) {
-        const errorMessage = error.message || 'Failed to import habits';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
-        throw error;
-      } finally {
-        dispatch({ type: actionTypes.SET_LOADING, payload: false });
-      }
-    },
-
-    // Calculate streak for a specific habit
-    calculateHabitStreak: (habitId) => {
-      const habit = state.habits.find(h => h.id === habitId);
-      if (!habit) return 0;
-      
-      return habitService.calculateCurrentStreak(habit);
-    },
-
-    // Get habit by ID
-    getHabitById: (habitId) => {
-      return state.habits.find(habit => habit.id === habitId) || null;
-    },
-
-    // Clear error
-    clearError: () => {
-      dispatch({ type: actionTypes.CLEAR_ERROR });
-      clearAppError();
-    }
+  // Functions for calculating streaks - moved outside useEffect for clarity
+  const getDaysDifference = (date1, date2) => {
+    const oneDay = 1000 * 60 * 60 * 24;
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.round(diffTime / oneDay);
   };
+
+  const calculateCurrentStreak = (habit) => {
+    if (!habit.completions || habit.completions.length === 0) return 0;
+    const today = new Date();
+    const sortedCompletions = habit.completions.map(date => new Date(date)).sort((a, b) => b - a);
+    let streak = 0;
+    let currentDate = new Date(today);
+    const todayString = formatDateForInput(today);
+    if (!habit.completions.includes(todayString)) {
+      currentDate.setDate(currentDate.getDate() - 1);
+    }
+    while (true) {
+      const dateString = formatDateForInput(currentDate);
+      if (habit.completions.includes(dateString)) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  const calculateLongestStreak = (habit) => {
+    if (!habit.completions || habit.completions.length < 1) return 0;
+    const sortedDates = habit.completions.map(date => new Date(date)).sort((a, b) => a - b);
+    if (sortedDates.length === 1) return 1;
+    let longestStreak = 1;
+    let currentStreak = 1;
+    for (let i = 1; i < sortedDates.length; i++) {
+      if (getDaysDifference(sortedDates[i - 1], sortedDates[i]) === 1) {
+        currentStreak++;
+      } else {
+        longestStreak = Math.max(longestStreak, currentStreak);
+        currentStreak = 1;
+      }
+    }
+    return Math.max(longestStreak, currentStreak);
+  };
+
+  const calculateMaxLongestStreak = (habits) => {
+    if (!habits || habits.length === 0) return 0;
+    return Math.max(0, ...habits.map(calculateLongestStreak));
+  };
+
+  // Effect to update stats and categories when habits change.
+  useEffect(() => {
+    if (!state.initialized || state.loading) return;
+
+    const currentHabitsJSON = JSON.stringify(state.habits);
+    
+    // Skip processing if habits haven't meaningfully changed
+    if (currentHabitsJSON === habitsRef.current) {
+      return;
+    }
+    
+    // Update the ref and recalculate
+    habitsRef.current = currentHabitsJSON;
+
+    const today = formatDateForInput(new Date());
+    const newStats = {
+      totalHabits: state.habits.length,
+      activeHabits: state.habits.filter(h => h.frequency).length,
+      completedToday: state.habits.filter(h => h.completions?.includes(today)).length,
+      totalCompletions: state.habits.reduce((sum, h) => sum + (h.completions?.length || 0), 0),
+      longestStreak: calculateMaxLongestStreak(state.habits),
+      currentStreaks: state.habits.map(h => ({ 
+        habitId: h.id, 
+        habitTitle: h.title, 
+        streak: calculateCurrentStreak(h) 
+      })),
+      habitBreakdown: state.habits.reduce((breakdown, h) => {
+        if (h.frequency === 'daily') breakdown.daily++;
+        if (h.frequency === 'weekly') breakdown.weekly++;
+        return breakdown;
+      }, { daily: 0, weekly: 0 })
+    };
+    
+    newStats.completionRate = newStats.totalHabits > 0 ? 
+      Math.round((newStats.completedToday / newStats.totalHabits) * 100) : 0;
+
+    const newCategories = [...new Set(state.habits
+      .map(h => h.category)
+      .filter(c => c && c.trim() !== '')
+    )].sort();
+
+    dispatch({ type: actionTypes.SET_STATS, payload: newStats });
+    dispatch({ type: actionTypes.SET_CATEGORIES, payload: newCategories });
+
+  }, [state.habits, state.initialized, state.loading]);
+
+  const handleApiCall = useCallback(async (apiCall, successCallback) => {
+    dispatch({ type: actionTypes.SET_LOADING, payload: true });
+    clearAppError();
+    try {
+      const result = await apiCall();
+      if (successCallback) {
+        successCallback(result);
+      }
+      return result;
+    } catch (error) {
+      const errorMessage = error.message || 'An unexpected error occurred';
+      dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
+      setAppError(errorMessage);
+      throw error;
+    } finally {
+      dispatch({ type: actionTypes.SET_LOADING, payload: false });
+    }
+  }, [clearAppError, setAppError]);
+
+  const createHabit = useCallback((habitData) => handleApiCall(
+    () => habitService.createHabit(habitData),
+    (newHabit) => dispatch({ type: actionTypes.ADD_HABIT, payload: newHabit })
+  ), [handleApiCall]);
+
+  const updateHabit = useCallback((habitId, updates) => handleApiCall(
+    () => habitService.updateHabitDetails(habitId, updates),
+    (updatedHabit) => dispatch({ type: actionTypes.UPDATE_HABIT, payload: updatedHabit })
+  ), [handleApiCall]);
+
+  const deleteHabit = useCallback((habitId) => handleApiCall(
+    () => habitService.deleteHabit(habitId),
+    () => dispatch({ type: actionTypes.DELETE_HABIT, payload: habitId })
+  ), [handleApiCall]);
+
+  const toggleHabitCompletion = useCallback(async (habitId, dateString) => {
+    try {
+      clearAppError();
+      const updatedHabit = await habitService.toggleHabitCompletion(habitId, dateString);
+      dispatch({ type: actionTypes.UPDATE_HABIT, payload: updatedHabit });
+      return updatedHabit;
+    } catch (error) {
+      const errorMessage = error.message || 'Failed to toggle habit completion';
+      dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
+      setAppError(errorMessage);
+      throw error;
+    }
+  }, [clearAppError, setAppError]);
+
+  const markHabitCompleteToday = useCallback((habitId) => {
+    const today = formatDateForInput(new Date());
+    return toggleHabitCompletion(habitId, today);
+  }, [toggleHabitCompletion]);
+
+  const getTodaysHabits = useCallback(async () => {
+    try {
+      clearAppError();
+      return await habitService.getTodaysHabits();
+    } catch (error) {
+      const errorMessage = error.message || "Failed to get today's habits";
+      dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
+      setAppError(errorMessage);
+      throw error;
+    }
+  }, [clearAppError, setAppError]);
+
+  const getHabitCalendarData = useCallback(async (habitId, year, month) => {
+    try {
+      clearAppError();
+      return await habitService.getHabitCalendarData(habitId, year, month);
+    } catch (error) {
+      const errorMessage = error.message || 'Failed to get habit calendar data';
+      dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
+      setAppError(errorMessage);
+      throw error;
+    }
+  }, [clearAppError, setAppError]);
+
+  const getFilteredHabits = useCallback((filters) => {
+    return state.habits.filter(habit => {
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        if (!habit.title?.toLowerCase().includes(searchTerm) &&
+            !habit.description?.toLowerCase().includes(searchTerm) &&
+            !habit.category?.toLowerCase().includes(searchTerm)) {
+          return false;
+        }
+      }
+      if (filters.frequency && filters.frequency !== 'all' && habit.frequency !== filters.frequency) return false;
+      if (filters.category && filters.category !== 'all' && habit.category !== filters.category) return false;
+      if (filters.completedToday && filters.completedToday !== 'all') {
+        const today = formatDateForInput(new Date());
+        const isCompleted = habit.completions?.includes(today);
+        if (filters.completedToday === 'yes' && !isCompleted) return false;
+        if (filters.completedToday === 'no' && isCompleted) return false;
+      }
+      return true;
+    });
+  }, [state.habits]);
+
+  const refreshHabits = useCallback(() => handleApiCall(
+    () => habitService.getAllHabits(),
+    (habits) => dispatch({ type: actionTypes.SET_HABITS, payload: habits })
+  ), [handleApiCall]);
+
+  const exportHabits = useCallback(() => habitService.exportHabits(), []);
+
+  const importHabits = useCallback(async (jsonData) => {
+    await handleApiCall(() => habitService.importHabits(jsonData));
+    await refreshHabits();
+  }, [handleApiCall, refreshHabits]);
+
+  const calculateHabitStreak = useCallback((habitId) => {
+    const habit = state.habits.find(h => h.id === habitId);
+    return habit ? calculateCurrentStreak(habit) : 0;
+  }, [state.habits]);
+
+  const getHabitById = useCallback((habitId) => {
+    return state.habits.find(habit => habit.id === habitId) || null;
+  }, [state.habits]);
+
+  const clearError = useCallback(() => {
+    dispatch({ type: actionTypes.CLEAR_ERROR });
+    clearAppError();
+  }, [clearAppError]);
 
   const value = {
     ...state,
-    ...actions
+    createHabit,
+    updateHabit,
+    deleteHabit,
+    toggleHabitCompletion,
+    markHabitCompleteToday,
+    getTodaysHabits,
+    getHabitCalendarData,
+    getFilteredHabits,
+    refreshHabits,
+    exportHabits,
+    importHabits,
+    calculateHabitStreak,
+    getHabitById,
+    clearError
   };
 
   return (

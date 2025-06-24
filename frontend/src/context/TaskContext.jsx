@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import taskService from '../services/taskService';
 import { useApp } from './AppContext';
 import { 
@@ -124,44 +124,78 @@ const TaskContext = createContext();
 export const TaskProvider = ({ children }) => {
   const [state, dispatch] = useReducer(taskReducer, initialState);
   const { setError: setAppError, clearError: clearAppError } = useApp();
+  const tasksRef = useRef(null);
 
-  // Helper to update stats and categories
-  const updateDerivedData = useCallback((tasks) => {
-    const stats = getTaskStats(tasks);
-    const categories = [...new Set(tasks
-      .map(task => task.category)
-      .filter(category => category && category.trim() !== '')
-    )].sort();
-    
-    dispatch({ type: actionTypes.SET_STATS, payload: stats });
-    dispatch({ type: actionTypes.SET_CATEGORIES, payload: categories });
-  }, []);
-
-  // Load tasks on mount
+  // Load tasks on mount - only once
   useEffect(() => {
+    // Only load if not initialized
+    if (state.initialized) return;
+    
+    let isMounted = true;
     const loadTasks = async () => {
       try {
         dispatch({ type: actionTypes.SET_LOADING, payload: true });
         const tasks = await taskService.getAllTasks();
-        dispatch({ type: actionTypes.SET_TASKS, payload: tasks });
-        updateDerivedData(tasks);
-        dispatch({ type: actionTypes.SET_INITIALIZED, payload: true });
+        
+        if (isMounted) {
+          tasksRef.current = JSON.stringify(tasks);
+          
+          // Calculate stats and categories once
+          const stats = getTaskStats(tasks);
+          const categories = [...new Set(tasks
+            .map(task => task.category)
+            .filter(category => category && category.trim() !== '')
+          )].sort();
+          
+          dispatch({ type: actionTypes.SET_TASKS, payload: tasks });
+          dispatch({ type: actionTypes.SET_STATS, payload: stats });
+          dispatch({ type: actionTypes.SET_CATEGORIES, payload: categories });
+          dispatch({ type: actionTypes.SET_INITIALIZED, payload: true });
+        }
       } catch (error) {
-        const errorMessage = error.message || 'Failed to load tasks';
-        dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
-        setAppError(errorMessage);
+        if (isMounted) {
+          const errorMessage = error.message || 'Failed to load tasks';
+          dispatch({ type: actionTypes.SET_ERROR, payload: errorMessage });
+          setAppError(errorMessage);
+        }
+      } finally {
+        if (isMounted) {
+          dispatch({ type: actionTypes.SET_LOADING, payload: false });
+        }
       }
     };
 
     loadTasks();
-  }, [setAppError, updateDerivedData]);
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [setAppError, state.initialized]);
 
-  // Update derived data when tasks change
+  // Update derived data when tasks change - only after initialized
   useEffect(() => {
-    if (state.initialized) {
-      updateDerivedData(state.tasks);
+    if (!state.initialized || state.loading) return;
+    
+    const currentTasksJSON = JSON.stringify(state.tasks);
+    
+    // Skip processing if tasks haven't meaningfully changed
+    if (currentTasksJSON === tasksRef.current) {
+      return;
     }
-  }, [state.tasks, state.initialized, updateDerivedData]);
+    
+    // Update the ref and recalculate
+    tasksRef.current = currentTasksJSON;
+
+    const stats = getTaskStats(state.tasks);
+    const categories = [...new Set(state.tasks
+      .map(task => task.category)
+      .filter(category => category && category.trim() !== '')
+    )].sort();
+      
+    dispatch({ type: actionTypes.SET_STATS, payload: stats });
+    dispatch({ type: actionTypes.SET_CATEGORIES, payload: categories });
+    
+  }, [state.tasks, state.initialized, state.loading]);
 
   // Action creators
   const actions = {
