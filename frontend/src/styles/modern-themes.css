@@ -1,0 +1,209 @@
+/* Modern Light Theme (Default) */
+:root,
+[data-theme="light"] {
+  /* Base Colors - Light Mode */  
+  --color-background: #fafbfc;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-card: #ffffff;
+  --color-text-primary: #1a202c;
+  --color-text-secondary: #4a5568;
+  --color-text-tertiary: #718096;
+  --color-text-inverse: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-light: #f0f4f8;
+  --color-border-strong: #cbd5e0;
+  --color-hover: rgba(99, 102, 241, 0.08);
+  --color-focus: rgba(99, 102, 241, 0.12);
+  --color-overlay: rgba(26, 32, 44, 0.4);
+
+  /* Component-specific Light Theme Colors */
+  --color-sidebar-bg: #ffffff;
+  --color-header-bg: rgba(255, 255, 255, 0.8);
+  --color-input-bg: #ffffff;  
+  --color-dropdown-bg: #ffffff;
+  --color-tooltip-bg: #2d3748;
+  --color-tooltip-text: #ffffff;
+  --color-modal-bg: rgba(255, 255, 255, 0.95);
+  --color-modal-backdrop: rgba(26, 32, 44, 0.5);
+
+  /* Status Colors - Light Mode */
+  --color-task-todo: #f7fafc;
+  --color-task-in-progress: #fef5e7;
+  --color-task-done: #f0fff4;
+  --color-task-overdue: #fed7d7;
+  --color-habit-completed: #f0fff4;
+  --color-habit-pending: #f7fafc;
+  --color-habit-streak: #fef5e7;
+
+  /* Priority Colors - Light Mode */
+  --color-priority-high: #fed7d7;
+  --color-priority-medium: #fef5e7;
+  --color-priority-low: #f0fff4;
+
+  /* Calendar Colors - Light Mode */
+  --color-calendar-today: #e6fffa;
+  --color-calendar-completed: #f0fff4;
+  --color-calendar-available: #ffffff;
+  --color-calendar-selected: #bee3f8;
+
+  /* Shadows - Light Mode */
+  --shadow-xs: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-2xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.3);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-floating: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  /* Glass morphism - Light Mode */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-backdrop: blur(20px);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+}
+
+/* Modern Dark Theme */
+[data-theme="dark"],
+.dark-mode {
+  /* Base Colors - Dark Mode */
+  --color-background: #0f0f23;
+  --color-surface: #1a1a2e;
+  --color-surface-elevated: #16213e;
+  --color-surface-muted: #16213e;
+  --color-card: #1a1a2e;
+  --color-text-primary: #f7fafc;
+  --color-text-secondary: #cbd5e0;
+  --color-text-tertiary: #a0aec0;
+  --color-text-inverse: #1a202c;
+  --color-border: #2d3748;
+  --color-border-light: #4a5568;
+  --color-border-strong: #4a5568;
+  --color-hover: rgba(99, 102, 241, 0.12);
+  --color-focus: rgba(99, 102, 241, 0.2);
+  --color-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Component-specific Dark Theme Colors */
+  --color-sidebar-bg: #1a1a2e;
+  --color-header-bg: rgba(26, 26, 46, 0.8);
+  --color-input-bg: #2d3748;
+  --color-dropdown-bg: #2d3748;
+  --color-tooltip-bg: #4a5568;
+  --color-tooltip-text: #f7fafc;
+  --color-modal-bg: rgba(26, 26, 46, 0.95);
+  --color-modal-backdrop: rgba(0, 0, 0, 0.8);
+
+  /* Status Colors - Dark Mode */
+  --color-task-todo: rgba(45, 55, 72, 0.6);
+  --color-task-in-progress: rgba(237, 137, 54, 0.2);
+  --color-task-done: rgba(72, 187, 120, 0.2);
+  --color-task-overdue: rgba(245, 101, 101, 0.2);
+  --color-habit-completed: rgba(72, 187, 120, 0.2);
+  --color-habit-pending: rgba(45, 55, 72, 0.6);
+  --color-habit-streak: rgba(237, 137, 54, 0.2);
+
+  /* Priority Colors - Dark Mode */
+  --color-priority-high: rgba(245, 101, 101, 0.2);
+  --color-priority-medium: rgba(237, 137, 54, 0.2);
+  --color-priority-low: rgba(72, 187, 120, 0.2);
+
+  /* Calendar Colors - Dark Mode */
+  --color-calendar-today: rgba(99, 102, 241, 0.2);
+  --color-calendar-completed: rgba(72, 187, 120, 0.2);
+  --color-calendar-available: #2d3748;
+  --color-calendar-selected: rgba(66, 153, 225, 0.3);
+
+  /* Shadows - Dark Mode */
+  --shadow-xs: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-2xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.4);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-floating: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  /* Glass morphism - Dark Mode */
+  --glass-bg: rgba(26, 26, 46, 0.3);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-backdrop: blur(20px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Auto Theme (System Preference) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    /* Apply dark theme variables */
+    --color-background: #0f0f23;
+    --color-surface: #1a1a2e;
+    --color-surface-elevated: #16213e;
+    --color-surface-muted: #16213e;
+    --color-card: #1a1a2e;
+    --color-text-primary: #f7fafc;
+    --color-text-secondary: #cbd5e0;
+    --color-text-tertiary: #a0aec0;
+    --color-text-inverse: #1a202c;
+    --color-border: #2d3748;
+    --color-border-light: #4a5568;
+    --color-border-strong: #4a5568;
+    --color-hover: rgba(99, 102, 241, 0.12);
+    --color-focus: rgba(99, 102, 241, 0.2);
+    --color-overlay: rgba(0, 0, 0, 0.7);
+
+    /* Apply all other dark theme variables */
+    --color-sidebar-bg: #1a1a2e;
+    --color-header-bg: rgba(26, 26, 46, 0.8);
+    --color-input-bg: #2d3748;
+    --color-dropdown-bg: #2d3748;
+    --color-tooltip-bg: #4a5568;
+    --color-tooltip-text: #f7fafc;
+  }
+}
+
+/* Modern body classes for theme switching */
+body.light-mode {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+body.dark-mode {
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --color-text-secondary: #000000;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+  
+  [data-theme="dark"] {
+    --color-border: #ffffff;
+    --color-text-secondary: #ffffff;
+  }
+}
+
+/* Smooth transitions for theme switching */
+*,
+*::before,
+*::after {
+  transition: background-color var(--duration-fast) var(--ease-in-out),
+              color var(--duration-fast) var(--ease-in-out),
+              border-color var(--duration-fast) var(--ease-in-out),
+              box-shadow var(--duration-fast) var(--ease-in-out);
+}
+
+/* Theme-specific scrollbar styling */
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-400);
+}

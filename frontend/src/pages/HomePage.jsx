@@ -4,142 +4,233 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { Button } from '../components/common';
 
+// Keyframe animations
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-const floatAnimation = keyframes`
+const float = keyframes`
   0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-20px); }
   100% { transform: translateY(0px); }
 `;
 
-const HomeContainer = styled.div`
-  min-height: 100vh;
-  background: linear-gradient(135deg, var(--color-background), var(--color-surface));
-  color: var(--color-text-primary);
+const gradientAnimation = keyframes`
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 `;
 
-const Hero = styled.section`
+// Main container
+const HomeContainer = styled.div`
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  overflow-x: hidden;
+`;
+
+// Header
+const Header = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.3s ease;
+
+  .dark-mode & {
+    background: rgba(17, 24, 39, 0.8);
+  }
+`;
+
+const Logo = styled.div`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-500);
+`;
+
+const NavActions = styled.div`
+  display: flex;
+  gap: var(--space-3);
+`;
+
+// Hero Section
+const HeroSection = styled.section`
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 120px var(--space-5) 80px;
-  animation: ${fadeIn} 1s ease;
+  min-height: 90vh;
+  padding: var(--space-10) var(--space-5);
+  background: linear-gradient(135deg, var(--color-background), var(--color-surface));
+`;
 
-  @media (max-width: 768px) {
-    padding: 80px var(--space-4) 60px;
-  }
+const HeroContent = styled.div`
+  z-index: 2;
+  animation: ${fadeIn} 1s ease-out;
 `;
 
 const HeroTitle = styled.h1`
-  font-size: 4rem;
+  font-size: 4.5rem;
   font-weight: 800;
   margin: 0 0 var(--space-4) 0;
-  background: linear-gradient(90deg, var(--color-primary-500), var(--color-success));
+  background: linear-gradient(90deg, var(--color-primary-500), var(--color-success-500));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 `;
 
 const HeroSubtitle = styled.p`
-  font-size: 1.5rem;
-  max-width: 700px;
+  font-size: 1.25rem;
+  max-width: 650px;
   color: var(--color-text-secondary);
-  margin: 0 0 var(--space-8) 0;
-  line-height: 1.5;
+  margin: 0 auto var(--space-8) auto;
+  line-height: 1.6;
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 `;
 
 const GetStartedButton = styled.button`
-  background: var(--color-primary-500);
+  background: linear-gradient(90deg, var(--color-primary-500), var(--color-primary-600));
   color: white;
   border: none;
-  padding: 16px 32px;
+  padding: var(--space-4) var(--space-8);
   border-radius: 50px;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4);
   }
 `;
 
-const AuthButtons = styled.div`
-  display: flex;
-  gap: var(--space-4);
-  margin-top: var(--space-6);
-  
-  @media (max-width: 480px) {
-    flex-direction: column;
-    width: 100%;
-    max-width: 300px;
+// Animated background shapes
+const AnimatedShape = styled.div`
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--color-primary-300), var(--color-success-300));
+  opacity: 0.1;
+  animation: ${float} infinite ease-in-out;
+  z-index: 1;
+
+  .dark-mode & {
+    opacity: 0.2;
+  }
+
+  &:nth-child(1) {
+    width: 200px;
+    height: 200px;
+    top: 10%;
+    left: 15%;
+    animation-duration: 12s;
+  }
+  &:nth-child(2) {
+    width: 100px;
+    height: 100px;
+    top: 20%;
+    right: 20%;
+    animation-duration: 8s;
+    animation-delay: 2s;
+  }
+  &:nth-child(3) {
+    width: 150px;
+    height: 150px;
+    bottom: 15%;
+    left: 25%;
+    animation-duration: 10s;
+  }
+  &:nth-child(4) {
+    width: 50px;
+    height: 50px;
+    bottom: 10%;
+    right: 10%;
+    animation-duration: 6s;
+    animation-delay: 1s;
   }
 `;
 
-const FeaturesSection = styled.section`
-  padding: 100px var(--space-5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: var(--color-surface);
-
-  @media (max-width: 768px) {
-    padding: 60px var(--space-4);
-  }
+// Generic Section
+const Section = styled.section`
+  padding: var(--space-10) var(--space-6);
+  text-align: center;
 `;
 
 const SectionTitle = styled.h2`
-  font-size: 2.5rem;
+  font-size: 2.8rem;
   font-weight: 700;
   margin-bottom: var(--space-8);
-  text-align: center;
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
+  color: var(--color-text-primary);
 `;
 
+// Features Section
 const FeatureGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--space-6);
   max-width: 1200px;
-  width: 100%;
+  margin: 0 auto;
 `;
 
 const FeatureCard = styled.div`
   background: var(--color-card);
-  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
   padding: var(--space-6);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  transition: transform 0.3s ease;
-  animation: ${fadeIn} 0.8s ease forwards;
-  animation-delay: ${props => props.$delay || '0s'};
-  opacity: 0;
+  text-align: left;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1), transparent 40%);
+    transform: scale(0);
+    transition: transform 0.5s ease;
+  }
 
   &:hover {
     transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-300);
+  }
+
+  &:hover:before {
+    transform: scale(1);
   }
 `;
 
 const FeatureIcon = styled.div`
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: var(--space-4);
-  animation: ${floatAnimation} 3s ease-in-out infinite;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-success-500));
+  width: 60px;
+  height: 60px;
+  border-radius: var(--border-radius-md);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const FeatureTitle = styled.h3`
@@ -153,98 +244,105 @@ const FeatureDescription = styled.p`
   line-height: 1.6;
 `;
 
-const IllustrationSection = styled.section`
-  padding: 100px var(--space-5);
+// Showcase Section
+const ShowcaseSection = styled(Section)`
+  background-color: var(--color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   gap: var(--space-8);
+  flex-wrap: wrap;
+  text-align: left;
 
-  @media (max-width: 768px) {
-    padding: 60px var(--space-4);
-    flex-direction: column;
+  &:nth-of-type(odd) {
+    flex-direction: row-reverse;
   }
 `;
 
-const IllustrationContent = styled.div`
+const ShowcaseContent = styled.div`
   flex: 1;
   min-width: 300px;
   max-width: 500px;
-  animation: ${fadeIn} 1s ease;
 `;
 
-const IllustrationTitle = styled.h2`
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: var(--space-4);
-
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-`;
-
-const IllustrationDescription = styled.p`
-  font-size: 1.1rem;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-  margin-bottom: var(--space-5);
-`;
-
-const IllustrationImage = styled.div`
+const ShowcaseImage = styled.div`
   flex: 1;
   min-width: 300px;
-  max-width: 600px;
-  height: 400px;
-  background-color: var(--color-primary-100);
-  border-radius: 16px;
+  max-width: 500px;
+  height: 350px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-4);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 5rem;
-  animation: ${floatAnimation} 6s ease-in-out infinite;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-    pointer-events: none;
+  flex-direction: column;
+  transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);
+  transition: transform 0.5s ease;
+
+  ${ShowcaseSection}:nth-of-type(odd) & {
+    transform: perspective(1000px) rotateY(10deg) rotateX(5deg);
+  }
+
+  &:hover {
+    transform: perspective(1000px) rotateY(0) rotateX(0);
   }
 `;
 
-const CTASection = styled.section`
-  padding: 100px var(--space-5);
-  text-align: center;
-  background: linear-gradient(45deg, var(--color-primary-700), var(--color-primary-500));
-  color: white;
+// Mock UI elements for showcase
+const MockHeader = styled.div`
+  height: 30px;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-3);
+  gap: var(--space-2);
+`;
 
-  @media (max-width: 768px) {
-    padding: 60px var(--space-4);
-  }
+const MockDot = styled.div`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: ${props => props.color};
+`;
+
+const MockContent = styled.div`
+  flex: 1;
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-sm);
+`;
+
+// CTA Section
+const CTASection = styled(Section)`
+  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800));
+  color: white;
+  border-radius: 20px;
+  margin: var(--space-10) var(--space-6);
+  padding: var(--space-8);
 `;
 
 const CTATitle = styled.h2`
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: var(--space-4);
-  
-  @media (max-width: 768px) {
-    font-size: 2rem;
-  }
 `;
 
 const CTADescription = styled.p`
-  font-size: 1.2rem;
-  max-width: 700px;
+  font-size: 1.1rem;
+  max-width: 600px;
   margin: 0 auto var(--space-6) auto;
   opacity: 0.9;
+`;
+
+// Footer
+const Footer = styled.footer`
+  padding: var(--space-6);
+  text-align: center;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
 `;
 
 const HomePage = () => {
@@ -252,107 +350,85 @@ const HomePage = () => {
   const { setActiveRoute } = useApp();
 
   const handleGetStarted = () => {
-    setActiveRoute('/dashboard');
-    navigate('/dashboard');
+    navigate('/signup');
   };
 
   return (
     <HomeContainer>
-      <Hero>
-        <HeroTitle>TaskFlow</HeroTitle>
-        <HeroSubtitle>
-          Your personal productivity companion for managing tasks and building consistent habits
-        </HeroSubtitle>
-        <AuthButtons>
-          <GetStartedButton onClick={() => navigate('/signup')}>
-            Sign Up
+      <Header>
+        <Logo>TaskFlow</Logo>
+        <NavActions>
+          <Button variant="secondary" onClick={() => navigate('/login')}>Log In</Button>
+          <Button variant="primary" onClick={() => navigate('/signup')}>Sign Up</Button>
+        </NavActions>
+      </Header>
+
+      <HeroSection>
+        <AnimatedShape />
+        <AnimatedShape />
+        <AnimatedShape />
+        <AnimatedShape />
+        <HeroContent>
+          <HeroTitle>Unleash Your Productivity</HeroTitle>
+          <HeroSubtitle>
+            TaskFlow is your all-in-one solution to organize tasks, build lasting habits, and achieve your goals with clarity and focus.
+          </HeroSubtitle>
+          <GetStartedButton onClick={handleGetStarted}>
+            Get Started for Free
           </GetStartedButton>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/login')}
-            style={{ minWidth: '120px' }}
-          >
-            Log In
-          </Button>
-        </AuthButtons>
-      </Hero>
+        </HeroContent>
+      </HeroSection>
 
-      <FeaturesSection>
-        <SectionTitle>Features</SectionTitle>
+      <Section>
+        <SectionTitle>Everything You Need to Succeed</SectionTitle>
         <FeatureGrid>
-          <FeatureCard $delay="0.1s">
+          <FeatureCard>
             <FeatureIcon>📝</FeatureIcon>
-            <FeatureTitle>Task Management</FeatureTitle>
-            <FeatureDescription>
-              Create, organize, and track your tasks with due dates, priorities, and custom categories. Keep your projects on schedule with visual status tracking.
-            </FeatureDescription>
+            <FeatureTitle>Intuitive Task Management</FeatureTitle>
+            <FeatureDescription>Create, categorize, and prioritize tasks effortlessly. Stay on top of your deadlines with smart reminders.</FeatureDescription>
           </FeatureCard>
-
-          <FeatureCard $delay="0.3s">
+          <FeatureCard>
             <FeatureIcon>🎯</FeatureIcon>
-            <FeatureTitle>Habit Tracker</FeatureTitle>
-            <FeatureDescription>
-              Build consistent habits by tracking daily and weekly goals. Visualize your streaks and celebrate your progress with intuitive calendar views.
-            </FeatureDescription>
+            <FeatureTitle>Powerful Habit Tracker</FeatureTitle>
+            <FeatureDescription>Build positive habits with our visual tracker. Monitor your streaks and stay motivated on your journey.</FeatureDescription>
           </FeatureCard>
-
-          <FeatureCard $delay="0.5s">
+          <FeatureCard>
             <FeatureIcon>📊</FeatureIcon>
-            <FeatureTitle>Smart Dashboard</FeatureTitle>
-            <FeatureDescription>
-              Get a comprehensive overview of your tasks and habits. Visualize upcoming deadlines, overdue items, and track your productivity trends.
-            </FeatureDescription>
-          </FeatureCard>
-
-          <FeatureCard $delay="0.7s">
-            <FeatureIcon>🌙</FeatureIcon>
-            <FeatureTitle>Dark Mode</FeatureTitle>
-            <FeatureDescription>
-              Reduce eye strain with our elegant dark mode. Seamlessly switch between light and dark themes based on your preference.
-            </FeatureDescription>
-          </FeatureCard>
-
-          <FeatureCard $delay="0.9s">
-            <FeatureIcon>📈</FeatureIcon>
-            <FeatureTitle>Progress Stats</FeatureTitle>
-            <FeatureDescription>
-              Track your habit streaks and task completion rates. Analyze your productivity patterns and identify areas for improvement.
-            </FeatureDescription>
-          </FeatureCard>
-
-          <FeatureCard $delay="1.1s">
-            <FeatureIcon>🔄</FeatureIcon>
-            <FeatureTitle>Recurring Tasks</FeatureTitle>
-            <FeatureDescription>
-              Set up recurring tasks to automatically manage repeating to-dos without manual re-creation. Perfect for routine activities.
-            </FeatureDescription>
+            <FeatureTitle>Insightful Analytics</FeatureTitle>
+            <FeatureDescription>Get a clear overview of your progress. Understand your productivity patterns and make data-driven improvements.</FeatureDescription>
           </FeatureCard>
         </FeatureGrid>
-      </FeaturesSection>
+      </Section>
 
-      <IllustrationSection>
-        <IllustrationContent>
-          <IllustrationTitle>Organize Your Life</IllustrationTitle>
-          <IllustrationDescription>
-            Stop juggling multiple apps and sticky notes. TaskFlow brings your tasks and habits together in one beautiful, intuitive interface designed to boost your productivity.
-          </IllustrationDescription>
-        </IllustrationContent>
-        <IllustrationImage>
-          📋✅
-        </IllustrationImage>
-      </IllustrationSection>
-
-      <IllustrationSection style={{ flexDirection: 'row-reverse', backgroundColor: 'var(--color-surface)' }}>
-        <IllustrationContent>
-          <IllustrationTitle>Build Better Habits</IllustrationTitle>
-          <IllustrationDescription>
-            Building new habits is hard, but our intuitive tracking system makes it easier by showing your progress visually and helping you maintain streaks.
-          </IllustrationDescription>
-        </IllustrationContent>
-        <IllustrationImage style={{ backgroundColor: 'var(--color-success-100)' }}>
-          📅🔄
-        </IllustrationImage>
-      </IllustrationSection>
+      <ShowcaseSection>
+        <ShowcaseContent>
+          <SectionTitle style={{textAlign: 'left', fontSize: '2.5rem'}}>Organize Your Life</SectionTitle>
+          <FeatureDescription>Stop juggling multiple apps and sticky notes. TaskFlow brings your tasks and habits together in one beautiful, intuitive interface designed to boost your productivity.</FeatureDescription>
+        </ShowcaseContent>
+        <ShowcaseImage>
+          <MockHeader>
+            <MockDot color="#ef4444" />
+            <MockDot color="#f59e0b" />
+            <MockDot color="#10b981" />
+          </MockHeader>
+          <MockContent />
+        </ShowcaseImage>
+      </ShowcaseSection>
+      
+      <ShowcaseSection>
+        <ShowcaseContent>
+          <SectionTitle style={{textAlign: 'left', fontSize: '2.5rem'}}>Build Better Habits</SectionTitle>
+          <FeatureDescription>Building new habits is hard, but our intuitive tracking system makes it easier by showing your progress visually and helping you maintain streaks.</FeatureDescription>
+        </ShowcaseContent>
+        <ShowcaseImage>
+          <MockHeader>
+            <MockDot color="#ef4444" />
+            <MockDot color="#f59e0b" />
+            <MockDot color="#10b981" />
+          </MockHeader>
+          <MockContent />
+        </ShowcaseImage>
+      </ShowcaseSection>
 
       <CTASection>
         <CTATitle>Ready to Get Organized?</CTATitle>
@@ -363,6 +439,10 @@ const HomePage = () => {
           Start Now
         </GetStartedButton>
       </CTASection>
+
+      <Footer>
+        <p>&copy; {new Date().getFullYear()} TaskFlow. All rights reserved.</p>
+      </Footer>
     </HomeContainer>
   );
 };
