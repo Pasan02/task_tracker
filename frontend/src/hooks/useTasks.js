@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTasks as useTasksContext } from '../context/TaskContext';
 import { 
   getTodayTasks, 
@@ -64,12 +64,25 @@ const useTasks = (filters = {}) => {
    * Update filters
    * @param {Object} newFilters - New filter values
    */
-  const updateFilters = (newFilters) => {
-    setLocalFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
-  };
+  const updateFilters = useCallback((newFilters) => {
+    // Check if the new filters are actually different
+    let hasChanges = false;
+    
+    for (const key in newFilters) {
+      if (localFilters[key] !== newFilters[key]) {
+        hasChanges = true;
+        break;
+      }
+    }
+    
+    // Only update if there are actual changes
+    if (hasChanges) {
+      setLocalFilters(prev => ({
+        ...prev,
+        ...newFilters
+      }));
+    }
+  }, [localFilters]);
 
   /**
    * Clear all filters
@@ -382,3 +395,4 @@ const useTasks = (filters = {}) => {
 };
 
 export default useTasks;
+export { useTasks };

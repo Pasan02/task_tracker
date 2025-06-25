@@ -1,6 +1,16 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+
+const fadeIn = keyframes`
+  from { opacity: 0; }
+  to { opacity: 1; }
+`;
+
+const slideUp = keyframes`
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+`;
 
 const Overlay = styled.div`
   position: fixed;
@@ -8,25 +18,29 @@ const Overlay = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
+  animation: ${fadeIn} 0.2s ease-out;
 `;
 
 const ModalContainer = styled.div`
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: var(--color-surface);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-xl);
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  animation: ${slideUp} 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border: 1px solid var(--color-border);
   
   ${props => props.$size === 'small' && css`
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
   `}
   
   ${props => props.$size === 'medium' && css`
@@ -38,41 +52,64 @@ const ModalContainer = styled.div`
     width: 100%;
     max-width: 800px;
   `}
+  
+  .dark-mode & {
+    border-color: var(--color-border-light);
+  }
+  
+  @media (max-width: 640px) {
+    width: 95%;
+    max-height: 85vh;
+  }
 `;
 
 const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(to right, var(--color-surface), var(--color-surface-secondary));
+  border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+  
+  .dark-mode & {
+    background: var(--color-surface);
+    border-color: var(--color-border-light);
+  }
 `;
 
 const ModalTitle = styled.h2`
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text-primary);
+  line-height: 1.4;
 `;
 
 const CloseButton = styled.button`
   background: none;
   border: none;
+  width: 32px;
+  height: 32px;
   font-size: 24px;
   cursor: pointer;
-  color: #6b7280;
-  padding: 4px;
-  border-radius: 4px;
-  line-height: 1;
+  color: var(--color-text-secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
   
   &:hover {
-    background-color: #f3f4f6;
-    color: #374151;
+    background-color: var(--color-hover);
+    color: var(--color-text-primary);
+    transform: rotate(90deg);
   }
 `;
 
 const ModalContent = styled.div`
   padding: 24px;
+  color: var(--color-text-primary);
 `;
 
 const Modal = ({ 

@@ -1,134 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  CountBadge,
+  HeaderActions,
+  ViewToggle,
+  ViewButton,
+  StatsBar,
+  StatItem,
+  StatNumber,
+  StatLabel,
+  ContentContainer,
+  EmptyState,
+  EmptyIcon,
+  EmptyTitle,
+  EmptyMessage,
+  ErrorContainer
+} from '../styles/PageStyles';
 import HabitList from '../components/habits/HabitList';
-import HabitForm from '../components/habits/HabitForm';
-import HabitFilter from '../components/habits/HabitFilter';
-import useHabits from '../hooks/useHabits'; // Changed from named import to default import
+import useHabits from '../hooks/useHabits';
 import { useApp } from '../context/AppContext';
-import { Button, Modal, Loading } from '../components/common';
+import { Button, Loading } from '../components/common';
+import HabitForm from '../components/habits/HabitForm';
 import { formatDateForInput } from '../utils/dateHelpers';
 
-const PageContainer = styled.div`
-  min-height: 100vh;
-  background-color: #f9fafb;
-  padding: 20px;
-`;
-
-const PageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-`;
-
-const PageTitle = styled.h1`
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111827;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const HabitCount = styled.span`
-  background-color: #dbeafe;
-  color: #1d4ed8;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: space-between;
-  }
-`;
-
-const ViewToggle = styled.div`
-  display: flex;
-  gap: 4px;
-  background-color: #f3f4f6;
-  border-radius: 6px;
-  padding: 2px;
-`;
-
-const ViewButton = styled.button`
-  background: ${props => props.$active ? 'white' : 'transparent'};
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  color: ${props => props.$active ? '#111827' : '#6b7280'};
-  font-weight: ${props => props.$active ? '500' : '400'};
-  box-shadow: ${props => props.$active ? '0 1px 2px rgba(0, 0, 0, 0.05)' : 'none'};
-  transition: all 0.2s ease;
-  
-  &:hover {
-    color: #111827;
-  }
-`;
-
-const StatsBar = styled.div`
-  display: flex;
-  gap: 16px;
-  padding: 16px 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  
-  @media (max-width: 768px) {
-    gap: 12px;
-  }
-`;
-
-const StatItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 80px;
-`;
-
-const StatNumber = styled.span`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${props => props.$color || '#111827'};
-`;
-
-const StatLabel = styled.span`
-  font-size: 0.75rem;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
+// Habit page specific styled components
 const TodaySection = styled.div`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 24px;
+  padding: 20px;
   border-radius: 12px;
   margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow: hidden;
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 const TodayTitle = styled.h2`
@@ -141,6 +53,10 @@ const TodayHabits = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr; // Single column on very small screens
+  }
 `;
 
 const TodayHabitCard = styled.div`
@@ -177,59 +93,37 @@ const CheckButton = styled.button`
   }
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 80px 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-`;
-
-const EmptyIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 16px;
-  opacity: 0.5;
-`;
-
-const EmptyTitle = styled.h3`
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #374151;
-`;
-
-const EmptyMessage = styled.p`
-  margin: 0 0 24px 0;
-  color: #6b7280;
-  font-size: 1rem;
-`;
-
-const ErrorContainer = styled.div`
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const FilterContainer = styled.div`
   background: white;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 20px;
+  padding: 16px;
   margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    padding: 12px;
+  }
 `;
 
 const FilterRow = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 16px;
+  gap: 12px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+  
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    & > button {
+      margin-top: 8px;
+      width: 100%;
+    }
+  }
   
   &:last-child {
     margin-bottom: 0;
@@ -239,8 +133,17 @@ const FilterRow = styled.div`
 const FilterGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   min-width: 120px;
+  
+  @media (max-width: 768px) {
+    min-width: 100px;
+  }
+  
+  @media (max-width: 480px) {
+    flex-grow: 1;
+    width: calc(50% - 4px);
+  }
 `;
 
 const Label = styled.label`
@@ -276,9 +179,8 @@ const Input = styled.input`
   }
 `;
 
-const HabitsPage = () => {
+const HabitsPage = ({ initialFilter }) => {
   const [currentView, setCurrentView] = useState('list');
-  const [showHabitForm, setShowHabitForm] = useState(false);
   const [editingHabit, setEditingHabit] = useState(null);
 
   const {
@@ -304,13 +206,28 @@ const HabitsPage = () => {
   const {
     setActiveRoute,
     openConfirmDialog,
-    closeConfirmDialog
+    closeConfirmDialog,
+    openHabitForm
   } = useApp();
 
   // Set active route when component mounts
   useEffect(() => {
-    setActiveRoute('habits');
-  }, [setActiveRoute]);
+    // Log the received filter for debugging
+    console.log('HabitsPage initialFilter:', initialFilter);
+    
+    // Set active route based on filter
+    const route = initialFilter === 'today' ? '/habits/today' : '/habits';
+    setActiveRoute(route);
+    
+    // Apply initial filter if provided
+    if (initialFilter === 'today') {
+      // Apply filter to show only habits NOT completed today
+      updateFilters({ completedToday: 'no' });
+    } else {
+      // Clear filters for regular habits page
+      clearFilters();
+    }
+  }, [initialFilter, setActiveRoute]); // Add setActiveRoute to dependencies
 
   const today = formatDateForInput(new Date());
   const todayCompleted = getTodayCompletedHabits();
@@ -318,31 +235,13 @@ const HabitsPage = () => {
 
   // Event handlers
   const handleCreateHabit = () => {
-    setEditingHabit(null);
-    setShowHabitForm(true);
+    // Use the AppContext openHabitForm instead of local state
+    openHabitForm();
   };
 
   const handleEditHabit = (habit) => {
-    setEditingHabit(habit);
-    setShowHabitForm(true);
-  };
-
-  const handleCloseHabitForm = () => {
-    setShowHabitForm(false);
-    setEditingHabit(null);
-  };
-
-  const handleSubmitHabit = async (habitData) => {
-    try {
-      if (editingHabit) {
-        await updateHabit(editingHabit.id, habitData);
-      } else {
-        await createHabit(habitData);
-      }
-      handleCloseHabitForm();
-    } catch (error) {
-      console.error('Failed to save habit:', error);
-    }
+    // Use the AppContext to open form with the habit
+    openHabitForm(habit);
   };
 
   const handleDeleteHabit = (habitId) => {
@@ -405,7 +304,7 @@ const HabitsPage = () => {
         <div>
           <PageTitle>
             🎯 Habits
-            <HabitCount>{habitStats.total}</HabitCount>
+            <CountBadge>{habitStats.total}</CountBadge>
           </PageTitle>
         </div>
         
@@ -593,20 +492,6 @@ const HabitsPage = () => {
           />
         )}
       </ContentContainer>
-
-      <Modal
-        isOpen={showHabitForm}
-        onClose={handleCloseHabitForm}
-        title={editingHabit ? 'Edit Habit' : 'Create New Habit'}
-        size="medium"
-      >
-        <HabitForm
-          habit={editingHabit}
-          onSubmit={handleSubmitHabit}
-          onCancel={handleCloseHabitForm}
-          loading={loading}
-        />
-      </Modal>
     </PageContainer>
   );
 };

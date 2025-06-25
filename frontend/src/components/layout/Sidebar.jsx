@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Navigation from './Navigation';
 import { useApp } from '../../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const SidebarContainer = styled.aside`
   width: var(--sidebar-width, 280px);
@@ -13,9 +14,26 @@ const SidebarContainer = styled.aside`
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 1100; /* Ensure sidebar is above content but below header overlay */
+  z-index: 1100;
   transform: translateX(${props => (props.$isOpen ? '0' : '-100%')});
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: var(--border-radius-full);
+  }
 
   @media (min-width: 769px) {
     transform: none;
@@ -38,6 +56,12 @@ const SidebarOverlay = styled.div`
   background-color: var(--color-overlay);
   z-index: 40;
   display: ${props => (props.$isOpen ? 'block' : 'none')};
+  animation: ${props => props.$isOpen ? 'fadeIn 0.3s forwards' : 'none'};
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
   @media (min-width: 769px) {
     display: none;
@@ -51,18 +75,39 @@ const ProfileSection = styled.div`
   padding: var(--space-4) 0;
   margin-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border);
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--color-primary-500), transparent);
+    border-radius: var(--border-radius-full);
+  }
 `;
 
 const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: var(--color-primary-500);
+  width: 42px;
+  height: 42px;
+  border-radius: 40%;
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 500;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--color-surface);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: scale(1.05) rotate(5deg);
+    box-shadow: var(--shadow-lg);
+  }
 `;
 
 const UserInfo = styled.div`
@@ -70,13 +115,33 @@ const UserInfo = styled.div`
 `;
 
 const UserName = styled.div`
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
 `;
 
 const UserStatus = styled.div`
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--color-success-500);
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
 `;
 
 const QuickActions = styled.div`
@@ -85,11 +150,24 @@ const QuickActions = styled.div`
 
 const ActionsTitle = styled.h3`
   margin: 0 0 var(--space-3) 0;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  position: relative;
+  display: inline-block;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 24px;
+    height: 2px;
+    background: var(--color-primary-500);
+    border-radius: var(--border-radius-full);
+  }
 `;
 
 const ActionButton = styled.button`
@@ -100,18 +178,42 @@ const ActionButton = styled.button`
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-md);
-  background: var(--color-card);
-  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease;
   margin-bottom: var(--space-2);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, transparent, rgba(var(--color-primary-rgb), 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+  }
 
   &:hover {
     border-color: var(--color-primary-500);
     background-color: var(--color-hover);
     color: var(--color-primary-500);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  &:hover::before {
+    transform: translateX(100%);
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 
   &:focus {
@@ -121,7 +223,13 @@ const ActionButton = styled.button`
 `;
 
 const ActionIcon = styled.span`
-  font-size: 1rem;
+  font-size: 1.1rem;
+  min-width: 20px;
+  transition: transform 0.2s ease;
+  
+  ${ActionButton}:hover & {
+    transform: scale(1.2);
+  }
 `;
 
 const Footer = styled.div`
@@ -147,6 +255,10 @@ const SupportLink = styled.button`
   cursor: pointer;
   border-radius: var(--border-radius-sm);
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 
   &:hover {
     background-color: var(--color-hover);
@@ -172,6 +284,7 @@ const Sidebar = ({
   }
 }) => {
   const { setActiveRoute, openTaskForm, openHabitForm } = useApp();
+  const navigate = useNavigate();
 
   const taskCounts = {
     total: stats.totalTasks,
@@ -186,7 +299,18 @@ const Sidebar = ({
   };
 
   const handleNavigate = (route) => {
-    setActiveRoute(route);
+    // Use navigate function for proper SPA routing
+    navigate(route);
+    
+    if (setActiveRoute) {
+      setActiveRoute(route);
+    }
+    
+    // Call parent handler if provided
+    if (onNavigate) {
+      onNavigate(route);
+    }
+    
     // Close sidebar on mobile after navigation
     if (window.innerWidth <= 768) {
       onClose && onClose();
@@ -195,7 +319,6 @@ const Sidebar = ({
 
   const handleCreateTask = () => {
     openTaskForm();
-    // Close sidebar on mobile
     if (window.innerWidth <= 768) {
       onClose && onClose();
     }
@@ -203,7 +326,6 @@ const Sidebar = ({
 
   const handleCreateHabit = () => {
     openHabitForm();
-    // Close sidebar on mobile
     if (window.innerWidth <= 768) {
       onClose && onClose();
     }

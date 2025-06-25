@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { TaskProvider } from './context/TaskContext';
 import { HabitProvider } from './context/HabitContext';
@@ -57,13 +57,39 @@ const AppContent = () => {
           <TasksPage />
         </Layout>
       } />
+      <Route path="/tasks/:filter" element={
+        <Layout isDarkMode={isDarkMode} onToggleTheme={toggleTheme}>
+          <TasksPageWithFilter />
+        </Layout>
+      } />
       <Route path="/habits" element={
         <Layout isDarkMode={isDarkMode} onToggleTheme={toggleTheme}>
           <HabitsPage />
         </Layout>
       } />
+      <Route path="/habits/:filter" element={
+        <Layout isDarkMode={isDarkMode} onToggleTheme={toggleTheme}>
+          <HabitsPageWithFilter />
+        </Layout>
+      } />
+
+      {/* Add a catch-all route to redirect to dashboard for any undefined routes */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
+};
+
+// Make sure the wrapper components are properly extracting the filter parameter:
+const TasksPageWithFilter = () => {
+  const { filter } = useParams();
+  console.log('TasksPageWithFilter filter:', filter); // Debug log
+  return <TasksPage initialFilter={filter} />;
+};
+
+const HabitsPageWithFilter = () => {
+  const { filter } = useParams();
+  console.log('HabitsPageWithFilter filter:', filter); // Debug log
+  return <HabitsPage initialFilter={filter} />;
 };
 
 export default App;

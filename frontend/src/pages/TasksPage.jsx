@@ -1,170 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import { 
+  PageContainer, 
+  PageHeader,
+  PageTitle,
+  CountBadge,
+  HeaderActions,
+  ViewToggle,
+  ViewButton,
+  StatsBar,
+  StatItem,
+  StatNumber,
+  StatLabel,
+  ContentContainer,
+  EmptyState,
+  EmptyIcon,
+  EmptyTitle,
+  EmptyMessage,
+  ErrorContainer
+} from '../styles/PageStyles';
 import TaskList from '../components/tasks/TaskList';
 import TaskFilter from '../components/tasks/TaskFilter';
-import TaskForm from '../components/tasks/TaskForm';
-import useTasks from '../hooks/useTasks'; // Changed from named import to default import
+import useTasks from '../hooks/useTasks';
 import { useApp } from '../context/AppContext';
-import { Button, Modal, Loading } from '../components/common';
+import { Button, Loading } from '../components/common';
 
-const PageContainer = styled.div`
-  min-height: 100vh;
-  background-color: #f9fafb;
-  padding: 20px;
-`;
-
-const PageHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
-`;
-
-const PageTitle = styled.h1`
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #111827;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const TaskCount = styled.span`
-  background-color: #dbeafe;
-  color: #1d4ed8;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: space-between;
-  }
-`;
-
-const ViewToggle = styled.div`
-  display: flex;
-  gap: 4px;
-  background-color: #f3f4f6;
-  border-radius: 6px;
-  padding: 2px;
-`;
-
-const ViewButton = styled.button`
-  background: ${props => props.$active ? 'white' : 'transparent'};
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  color: ${props => props.$active ? '#111827' : '#6b7280'};
-  font-weight: ${props => props.$active ? '500' : '400'};
-  box-shadow: ${props => props.$active ? '0 1px 2px rgba(0, 0, 0, 0.05)' : 'none'};
-  transition: all 0.2s ease;
-  
-  &:hover {
-    color: #111827;
-  }
-`;
-
-const StatsBar = styled.div`
-  display: flex;
-  gap: 16px;
-  padding: 16px 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  
-  @media (max-width: 768px) {
-    gap: 12px;
-  }
-`;
-
-const StatItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 80px;
-`;
-
-const StatNumber = styled.span`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: ${props => props.$color || '#111827'};
-`;
-
-const StatLabel = styled.span`
-  font-size: 0.75rem;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-`;
-
-const ContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: 80px 20px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-`;
-
-const EmptyIcon = styled.div`
-  font-size: 4rem;
-  margin-bottom: 16px;
-  opacity: 0.5;
-`;
-
-const EmptyTitle = styled.h3`
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #374151;
-`;
-
-const EmptyMessage = styled.p`
-  margin: 0 0 24px 0;
-  color: #6b7280;
-  font-size: 1rem;
-`;
-
-const ErrorContainer = styled.div`
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const TasksPage = () => {
+const TasksPage = ({ initialFilter }) => {
   const [currentView, setCurrentView] = useState('list');
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
 
   const {
     tasks,
@@ -189,41 +50,56 @@ const TasksPage = () => {
   const {
     setActiveRoute,
     openConfirmDialog,
-    closeConfirmDialog
+    closeConfirmDialog,
+    openTaskForm // Add openTaskForm to context methods
   } = useApp();
 
   // Set active route when component mounts
   useEffect(() => {
-    setActiveRoute('tasks');
-  }, [setActiveRoute]);
+    // Log the received filter for debugging
+    console.log('TasksPage initialFilter:', initialFilter);
+    
+    // Set active route based on filter
+    let route = '/tasks';
+    if (initialFilter) {
+      route = `/tasks/${initialFilter}`;
+    }
+    setActiveRoute(route);
+    
+    // Apply initial filter
+    if (initialFilter) {
+      let filterObj = {};
+      
+      switch (initialFilter) {
+        case 'today':
+          filterObj = { dueDate: 'today' };
+          break;
+        case 'upcoming':
+          filterObj = { upcoming: 'true' };
+          break;
+        case 'overdue':
+          filterObj = { overdue: 'true' };
+          break;
+        default:
+          filterObj = {};
+      }
+      
+      updateFilters(filterObj);
+    } else {
+      // Clear filters for regular tasks page
+      clearFilters();
+    }
+  }, [initialFilter, setActiveRoute]); // Add setActiveRoute to dependencies
 
   // Event handlers
   const handleCreateTask = () => {
-    setEditingTask(null);
-    setShowTaskForm(true);
+    // Use the AppContext openTaskForm instead of local state
+    openTaskForm();
   };
 
   const handleEditTask = (task) => {
-    setEditingTask(task);
-    setShowTaskForm(true);
-  };
-
-  const handleCloseTaskForm = () => {
-    setShowTaskForm(false);
-    setEditingTask(null);
-  };
-
-  const handleSubmitTask = async (taskData) => {
-    try {
-      if (editingTask) {
-        await updateTask(editingTask.id, taskData);
-      } else {
-        await createTask(taskData);
-      }
-      handleCloseTaskForm();
-    } catch (error) {
-      console.error('Failed to save task:', error);
-    }
+    // Use the AppContext to open form with the task
+    openTaskForm(task);
   };
 
   const handleDeleteTask = (taskId) => {
@@ -290,7 +166,7 @@ const TasksPage = () => {
         <div>
           <PageTitle>
             📋 Tasks
-            <TaskCount>{taskStats.total}</TaskCount>
+            <CountBadge>{taskStats.total}</CountBadge>
           </PageTitle>
         </div>
         
@@ -312,6 +188,7 @@ const TasksPage = () => {
           
           <Button 
             variant="primary" 
+            size="small" // Change to small for consistency
             onClick={handleCreateTask}
           >
             ➕ Add Task
@@ -393,20 +270,6 @@ const TasksPage = () => {
           />
         )}
       </ContentContainer>
-
-      <Modal
-        isOpen={showTaskForm}
-        onClose={handleCloseTaskForm}
-        title={editingTask ? 'Edit Task' : 'Create New Task'}
-        size="medium"
-      >
-        <TaskForm
-          task={editingTask}
-          onSubmit={handleSubmitTask}
-          onCancel={handleCloseTaskForm}
-          loading={loading}
-        />
-      </Modal>
     </PageContainer>
   );
 };

@@ -1,9 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// Import dark-mode.css first, then themes.css
-import './styles/dark-mode.css';
-import './styles/themes.css';
-import './styles/variables.css';
+// Import the consolidated theme file
+import './styles/theme-system.css';
+// Keep index.css for any other global styles
 import './index.css';
 import App from './App';
 

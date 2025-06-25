@@ -103,14 +103,14 @@ export const AppProvider = ({ children }) => {
   const toggleTheme = useCallback(() => {
     const newTheme = state.theme === 'dark' ? 'light' : 'dark';
     
-    // Add a transitioning class
+    // Add a transitioning class to prevent flash during transition
     document.documentElement.classList.add('theme-transitioning');
     document.body.classList.add('theme-transitioning');
     
     // Set data-theme attribute
     document.documentElement.setAttribute('data-theme', newTheme);
     
-    // Also toggle body class for redundancy
+    // Also toggle body class
     if (newTheme === 'dark') {
       document.body.classList.add('dark-mode');
     } else {
@@ -123,31 +123,29 @@ export const AppProvider = ({ children }) => {
     // Update state
     dispatch({ type: actionTypes.SET_THEME, payload: newTheme });
     
-    // Force a repaint to make the change immediate
-    const bodyStyles = window.getComputedStyle(document.body);
-    const _ = bodyStyles.backgroundColor;
-    
     // Remove transition prevention class after changes are applied
     setTimeout(() => {
       document.documentElement.classList.remove('theme-transitioning');
       document.body.classList.remove('theme-transitioning');
     }, 100);
-    
-    console.log('Theme changed to:', newTheme);
   }, [state.theme]);
 
-  // Enhanced setActiveRoute function that also navigates
+  // Update the setActiveRoute function to prevent duplicate navigation:
   const setActiveRoute = useCallback((route) => {
-    if (typeof route === 'string' && route !== state.activeRoute) {
+    if (typeof route === 'string') {
       // Ensure route starts with a slash for consistency
       const normalizedRoute = route.startsWith('/') ? route : `/${route}`;
-      prevPathRef.current = normalizedRoute;
-      dispatch({ type: actionTypes.SET_ACTIVE_ROUTE, payload: normalizedRoute });
       
-      // Actually navigate to the route using React Router
-      navigate(normalizedRoute);
+      // Only update if the route is actually different
+      if (normalizedRoute !== state.activeRoute) {
+        prevPathRef.current = normalizedRoute;
+        dispatch({ type: actionTypes.SET_ACTIVE_ROUTE, payload: normalizedRoute });
+        
+        // Don't navigate here - let the Navigation component handle it
+        // navigate(normalizedRoute);
+      }
     }
-  }, [state.activeRoute, navigate]);
+  }, [state.activeRoute]); // Remove navigate from dependencies
 
   const toggleSidebar = useCallback((isOpen) => {
     dispatch({ type: actionTypes.TOGGLE_SIDEBAR, payload: isOpen });

@@ -5,75 +5,131 @@ import { Button, Modal } from '../common';
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: var(--space-3);
+  
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: var(--border-radius-full);
+    margin: var(--space-2) 0;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: var(--border-radius-full);
+    
+    &:hover {
+      background-color: var(--color-text-tertiary);
+    }
+  }
+  
+  .dark-mode & {
+    scrollbar-color: var(--color-border-light) transparent;
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-border-light);
+      
+      &:hover {
+        background-color: var(--color-text-tertiary);
+      }
+    }
+  }
 `;
 
 const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-2);
+  position: relative;
+  transition: all 0.2s ease;
+  
+  &:focus-within {
+    transform: translateY(-2px);
+  }
 `;
 
 const Label = styled.label`
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.875rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: color 0.2s ease;
+  
+  ${FormGroup}:focus-within & {
+    color: var(--color-primary-500);
+  }
+`;
+
+const inputStyles = `
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  background-color: var(--color-input-bg);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-focus);
+  }
+  
+  &:hover:not(:focus):not(:disabled) {
+    border-color: var(--color-primary-300);
+    background-color: var(--color-hover);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  
+  .dark-mode & {
+    border-color: var(--color-border-light);
+  }
 `;
 
 const Input = styled.input`
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
-  
-  &:invalid {
-    border-color: #ef4444;
-  }
+  ${inputStyles}
 `;
 
 const TextArea = styled.textarea`
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 1rem;
+  ${inputStyles}
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
   font-family: inherit;
-  transition: border-color 0.2s ease;
-  
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  }
+  line-height: 1.5;
 `;
 
 const Select = styled.select`
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 1rem;
-  background-color: white;
-  transition: border-color 0.2s ease;
+  ${inputStyles}
+  cursor: pointer;
   
-  &:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  option {
+    background-color: var(--color-input-bg);
+    color: var(--color-text-primary);
   }
 `;
 
 const FormActions = styled.div`
   display: flex;
-  gap: 12px;
+  gap: var(--space-3);
   justify-content: flex-end;
+  margin-top: var(--space-3);
   
   @media (max-width: 480px) {
     flex-direction: column;
@@ -81,15 +137,36 @@ const FormActions = styled.div`
 `;
 
 const ErrorMessage = styled.span`
-  color: #ef4444;
-  font-size: 0.875rem;
+  color: var(--color-error-500);
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  
+  &::before {
+    content: '⚠️';
+    font-size: 0.75rem;
+  }
+  
+  animation: fadeIn 0.2s ease-in;
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+
+const Required = styled.span`
+  color: var(--color-error-500);
+  margin-left: var(--space-1);
 `;
 
 const TaskForm = ({ 
   isOpen = false,
   task = null, 
   onSubmit, 
-  onClose,  // Changed from onCancel to onClose for consistency
+  onClose,
   loading = false 
 }) => {
   const [formData, setFormData] = useState({
@@ -171,110 +248,105 @@ const TaskForm = ({
     onSubmit(taskData);
   };
 
-  // Wrap form with Modal component
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={task ? 'Edit Task' : 'Create New Task'}
-    >
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label htmlFor="title">Title *</Label>
-          <Input
-            id="title"
-            name="title"
-            type="text"
-            value={formData.title}
-            onChange={handleInputChange}
-            placeholder="Enter task title"
-            required
-          />
-          {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>}
-        </FormGroup>
+    <Form onSubmit={handleSubmit}>
+      <FormGroup>
+        <Label htmlFor="title">
+          Title <Required>*</Required>
+        </Label>
+        <Input
+          id="title"
+          name="title"
+          type="text"
+          value={formData.title}
+          onChange={handleInputChange}
+          placeholder="Enter task title"
+          required
+        />
+        {errors.title && <ErrorMessage>{errors.title}</ErrorMessage>}
+      </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="description">Description</Label>
-          <TextArea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Enter task description (optional)"
-          />
-        </FormGroup>
+      <FormGroup>
+        <Label htmlFor="description">Description</Label>
+        <TextArea
+          id="description"
+          name="description"
+          value={formData.description}
+          onChange={handleInputChange}
+          placeholder="Enter task description (optional)"
+        />
+      </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="dueDate">Due Date</Label>
-          <Input
-            id="dueDate"
-            name="dueDate"
-            type="date"
-            value={formData.dueDate}
-            onChange={handleInputChange}
-          />
-          {errors.dueDate && <ErrorMessage>{errors.dueDate}</ErrorMessage>}
-        </FormGroup>
+      <FormGroup>
+        <Label htmlFor="dueDate">Due Date</Label>
+        <Input
+          id="dueDate"
+          name="dueDate"
+          type="date"
+          value={formData.dueDate}
+          onChange={handleInputChange}
+        />
+        {errors.dueDate && <ErrorMessage>{errors.dueDate}</ErrorMessage>}
+      </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="priority">Priority</Label>
-          <Select
-            id="priority"
-            name="priority"
-            value={formData.priority}
-            onChange={handleInputChange}
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </Select>
-        </FormGroup>
+      <FormGroup>
+        <Label htmlFor="priority">Priority</Label>
+        <Select
+          id="priority"
+          name="priority"
+          value={formData.priority}
+          onChange={handleInputChange}
+        >
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </Select>
+      </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="status">Status</Label>
-          <Select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleInputChange}
-          >
-            <option value="todo">To Do</option>
-            <option value="in-progress">In Progress</option>
-            <option value="done">Done</option>
-          </Select>
-        </FormGroup>
+      <FormGroup>
+        <Label htmlFor="status">Status</Label>
+        <Select
+          id="status"
+          name="status"
+          value={formData.status}
+          onChange={handleInputChange}
+        >
+          <option value="todo">To Do</option>
+          <option value="in-progress">In Progress</option>
+          <option value="done">Done</option>
+        </Select>
+      </FormGroup>
 
-        <FormGroup>
-          <Label htmlFor="category">Category</Label>
-          <Input
-            id="category"
-            name="category"
-            type="text"
-            value={formData.category}
-            onChange={handleInputChange}
-            placeholder="Enter category (optional)"
-          />
-        </FormGroup>
+      <FormGroup>
+        <Label htmlFor="category">Category</Label>
+        <Input
+          id="category"
+          name="category"
+          type="text"
+          value={formData.category}
+          onChange={handleInputChange}
+          placeholder="Enter category (optional)"
+        />
+      </FormGroup>
 
-        <FormActions>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onClose}
-            disabled={loading}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            loading={loading}
-          >
-            {task ? 'Update Task' : 'Create Task'}
-          </Button>
-        </FormActions>
-      </Form>
-    </Modal>
+      <FormActions>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClose}
+          disabled={loading}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          variant="primary"
+          loading={loading}
+        >
+          {task ? 'Update Task' : 'Create Task'}
+        </Button>
+      </FormActions>
+    </Form>
   );
 };
 
